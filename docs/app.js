@@ -33,7 +33,7 @@ function nav(){
   if(c.part!==part){part=c.part;html+='<p class="nav-group">'+esc(part)+'</p>';}
   html+='<a class="nav-item" href="#'+c.id+'"><span>'+pad(i+1)+'</span><span>'+esc(c.title.split(':')[0])+'</span>'+(c.lab?'<i title="시각화 실험 포함">◈</i>':'')+'</a>';
  });
- html+='<p class="nav-group">07 · 스스로 판단하기</p><a class="nav-item" href="#practice"><span>16</span><span>혼합 문제와 풀이 복기</span></a>';
+ html+='<p class="nav-group">10 · 스스로 판단하기</p><a class="nav-item" href="#practice"><span>'+pad(CHAPTERS.length+1)+'</span><span>혼합 문제와 풀이 복기</span></a>';
  $('#chapters').innerHTML=html;
 }
 function card(c,i){
@@ -42,12 +42,13 @@ function card(c,i){
 function home(){
  document.title='AlgoBook — 생각을 코드로';
  $('#breadcrumb').textContent='나의 알고리즘 교과서';
- let html='<div class="home"><section class="book-intro"><div><p class="eyebrow">INTERACTIVE C++ TEXTBOOK</p><h1>생각을 코드로.<br><span>과정을 눈으로.</span></h1><p class="intro-text">왜 이 알고리즘일까요?<br>입력을 바꾸고, 한 단계씩 따라가며<br>풀이를 선택하는 근거를 익힙니다.</p><div class="intro-actions"><a class="button primary" href="#thinking">첫 장 읽기</a><a class="button secondary" href="#dfs">DFS 실험 시작</a></div></div><div class="cover-diagram" aria-label="DFS 호출 스택과 탐색 경로 예"><div class="diagram-caption"><span>DEPTH FIRST SEARCH</span><span>01 / 07</span></div>'+miniGraph()+'<div class="mini-stack"><span>CALL STACK</span><b>1</b><b>2</b><b class="orange">4</b><small>다음 이웃이 없으면<br>이전 호출로 돌아갑니다.</small></div></div></section><div class="book-meta"><span><b>15</b> 핵심 챕터</span><span><b>9</b> 단계별 실험</span><span><b>21</b> 판단 문제</span><span>C++17 · 실버~골드 핵심</span></div>';
+ let html='<div class="home"><section class="book-intro"><div><p class="eyebrow">INTERACTIVE C++ TEXTBOOK</p><h1>생각을 코드로.<br><span>과정을 눈으로.</span></h1><p class="intro-text">왜 이 알고리즘일까요?<br>입력을 바꾸고, 한 단계씩 따라가며<br>풀이를 선택하는 근거를 익힙니다.</p><div class="intro-actions"><a class="button primary" href="#thinking">첫 장 읽기</a><a class="button secondary" href="#dfs">DFS 실험 시작</a></div></div><div class="cover-diagram" aria-label="DFS 호출 스택과 탐색 경로 예"><div class="diagram-caption"><span>DEPTH FIRST SEARCH</span><span>01 / 07</span></div>'+miniGraph()+'<div class="mini-stack"><span>CALL STACK</span><b>1</b><b>2</b><b class="orange">4</b><small>다음 이웃이 없으면<br>이전 호출로 돌아갑니다.</small></div></div></section><div class="book-meta"><span><b>'+CHAPTERS.length+'</b> 학습 챕터</span><span><b>9</b> 단계별 실험</span><span><b>'+(CHAPTERS.length+MIXED.length)+'</b> 판단 문제</span><span>C++17 · 기초부터 실전 설계까지</span></div>';
  html+='<section class="featured"><div class="section-head"><div><p class="eyebrow">SEE THE PROCESS</p><h2>지금, 움직여 보세요</h2></div><p>진입부터 복귀까지. 문자에서 단어까지.</p></div><div class="feature-grid"><a href="#dfs" class="feature-card"><span class="feature-num">08 / GRAPH</span><h3>DFS의 다음 한 걸음</h3><p>간선을 바꾸고 호출 스택을 따라가며<br>방문과 탐색 종료를 구분하세요.</p><span class="text-link">DFS 실험실 열기 ↗</span></a><a href="#trie" class="feature-card trie-feature"><span class="feature-num">14 / STRING</span><h3>Trie에 단어 심기</h3><p>공유되는 접두사를 관찰하고<br>단어 검색과 접두사 검색을 비교하세요.</p><span class="text-link">Trie 실험실 열기 ↗</span></a></div></section>';
  html+='<section><div class="section-head"><div><p class="eyebrow">CONTENTS</p><h2>문제 해석에서 최적해까지</h2></div><span class="muted">C++ 기초 문법을 아는 분을 위한 구성</span></div><div class="contents-grid">';
  let part='';
  CHAPTERS.forEach((c,i)=>{if(c.part!==part){if(part)html+='</div>';part=c.part;html+='<div class="chapter-group"><h3 class="group-title">'+esc(part)+'</h3>';}html+=card(c,i);});
- html+='</div><div class="chapter-group"><h3 class="group-title">07 · 스스로 판단하기</h3><a class="chapter-card" href="#practice"><span class="chapter-no">16</span><div><h3>혼합 문제와 풀이 복기</h3><p>유형 이름 없이 접근법 고르기</p></div><span class="card-tag">6문제</span></a></div></div></section>';
+ html+='</div><div class="chapter-group"><h3 class="group-title">10 · 스스로 판단하기</h3><a class="chapter-card" href="#practice"><span class="chapter-no">'+pad(CHAPTERS.length+1)+'</span><div><h3>혼합 문제와 풀이 복기</h3><p>유형 이름 없이 접근법 고르기</p></div><span class="card-tag">'+MIXED.length+'문제</span></a></div></div></section>';
+ html+='<section class="reading-guide"><p class="eyebrow">EXAM STUDY PATH</p><h2>실전까지 이어지는 학습 순서</h2><div class="guide-grid"><div><b>01</b><h3><a href="#thinking">기초 판단 익히기</a></h3><p>제약과 복잡도, STL 연산 비용부터 확인합니다.</p></div><div><b>02</b><h3><a href="#sqrt-decomposition">심화 구조 연습하기</a></h3><p>격자 탐색, 최단경로 변형, 구간 갱신을 연결합니다.</p></div><div><b>03</b><h3><a href="#api-design">API 설계로 확장하기</a></h3><p>기출 유형의 반복 호출과 상태 변경을 추적합니다.</p></div><div><b>04</b><h3><a href="#practice">조건으로 풀이 고르기</a></h3><p>판단 문제를 풀고 작은 반례로 선택을 검증합니다.</p></div></div></section>';
  html+='<section class="reading-guide"><p class="eyebrow">HOW TO STUDY</p><h2>한 장을 읽는 네 번의 질문</h2><div class="guide-grid"><div><b>01</b><h3>어떤 조건인가?</h3><p>제약과 필요한 출력을 먼저 적습니다.</p></div><div><b>02</b><h3>왜 움직이는가?</h3><p>다음 상태를 예상한 뒤 한 단계 실행합니다.</p></div><div><b>03</b><h3>언제 틀리는가?</h3><p>음수·중복·경계를 바꿔 반례를 찾습니다.</p></div><div><b>04</b><h3>무엇을 남길까?</h3><p>다음 문제에도 쓸 판단 기준을 정리합니다.</p></div></div></section></div>';
  main.innerHTML=html;
 }
@@ -81,8 +82,8 @@ function lesson(c){
  if(c.lab)mountLab(c.lab,defaults[c.lab]);
 }
 function practice(){
- document.title='혼합 문제와 풀이 복기 · AlgoBook';$('#breadcrumb').textContent='16 / 혼합 문제와 풀이 복기';
- main.innerHTML='<article class="lesson practice"><div class="lesson-heading"><p class="eyebrow">CHAPTER 16 / TRANSFER</p><h1>유형 이름 없이,<br>스스로 판단하기.</h1><p class="lead">정답을 고르기 전에, 선택을 결정한 조건을 한 문장으로 말해 보세요.</p></div>'+MIXED.map(quizHTML).join('')+'<section class="workflow"><p class="eyebrow">AFTER SOLVING</p><h2>풀이를 끝내고 남길 네 줄</h2><ol><li>처음 놓친 조건은 무엇이었나?</li><li>완전탐색의 어떤 반복을 줄였나?</li><li>정확성을 보장하는 불변식 또는 논증은 무엇인가?</li><li>조건 하나가 바뀌면 이 풀이가 언제 실패하나?</li></ol><p>문제마다 정답 코드만 모으기보다, 다음 문제에 적용할 질문 하나를 남겨 보세요.</p></section><a class="button primary" href="#home">전체 목차로</a></article>';
+ document.title='혼합 문제와 풀이 복기 · AlgoBook';$('#breadcrumb').textContent=pad(CHAPTERS.length+1)+' / 혼합 문제와 풀이 복기';
+ main.innerHTML='<article class="lesson practice"><div class="lesson-heading"><p class="eyebrow">CHAPTER '+pad(CHAPTERS.length+1)+' / TRANSFER</p><h1>유형 이름 없이,<br>스스로 판단하기.</h1><p class="lead">정답을 고르기 전에, 선택을 결정한 조건을 한 문장으로 말해 보세요.</p></div>'+MIXED.map(quizHTML).join('')+'<section class="workflow"><p class="eyebrow">AFTER SOLVING</p><h2>풀이를 끝내고 남길 네 줄</h2><ol><li>처음 놓친 조건은 무엇이었나?</li><li>완전탐색의 어떤 반복을 줄였나?</li><li>정확성을 보장하는 불변식 또는 논증은 무엇인가?</li><li>조건 하나가 바뀌면 이 풀이가 언제 실패하나?</li></ol><p>문제마다 정답 코드만 모으기보다, 다음 문제에 적용할 질문 하나를 남겨 보세요.</p></section><a class="button primary" href="#home">전체 목차로</a></article>';
  wireQuizzes(MIXED);
 }
 function field(label,name,value,type='text',extra=''){
