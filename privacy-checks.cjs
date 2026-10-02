@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 global.window={};
-for(const file of ['content','advanced','cases','service-cases','engines','visuals','visual-advanced'])require('./docs/'+file+'.js');
+for(const file of ['content','advanced','cases','service-cases','exercises','engines','visuals','visual-advanced'])require('./docs/'+file+'.js');
 const concepts=window.CHAPTERS.filter(c=>c.concept);
 assert.equal(concepts.length,10);
 assert(concepts.every(c=>c.part==='09 · 핵심 개념과 재사용'));

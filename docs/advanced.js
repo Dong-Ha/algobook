@@ -42,7 +42,7 @@ window.CHAPTERS.push(
     check: ["어떤 방향으로 이동할 수 있는가?", "칸의 값이 이동 가능·불가를 어떻게 나타내는가?", "최단 거리인가, 연결된 영역인가?", "방문 처리를 중복 삽입 전에 했는가?"],
     complexity: "각 칸을 최대 한 번 방문하므로 O(NM) 시간 · dist와 큐 공간 O(NM)",
     code: "int shortestPath(const vector<string>& g, int sr, int sc, int tr, int tc) {\n    if (g.empty() || g[0].empty()) return -1;\n    int n = g.size(), m = g[0].size();\n    if (sr < 0 || sr >= n || tr < 0 || tr >= n ||\n        sc < 0 || sc >= m || tc < 0 || tc >= m) return -1;\n    if (g[sr][sc] == '0' || g[tr][tc] == '0') return -1;\n    vector<vector<int>> dist(n, vector<int>(m, -1));\n    queue<pair<int,int>> q;\n    const int dr[4] = {-1, 1, 0, 0};\n    const int dc[4] = {0, 0, -1, 1};\n    dist[sr][sc] = 0; q.push({sr, sc});\n    while (!q.empty()) {\n        auto [r, c] = q.front(); q.pop();\n        if (r == tr && c == tc) return dist[r][c]; // 이동 횟수\n        for (int d = 0; d < 4; ++d) {\n            int nr = r + dr[d], nc = c + dc[d];\n            if (nr < 0 || nr >= n || nc < 0 || nc >= m) continue;\n            if (g[nr][nc] == '0' || dist[nr][nc] != -1) continue;\n            dist[nr][nc] = dist[r][c] + 1;\n            q.push({nr, nc});\n        }\n    }\n    return -1;\n}",
-    quiz: { q: "가중치가 모두 같은 격자에서 최소 이동 횟수를 구할 때 기본 선택은?", options: ["BFS", "DFS", "정렬"], answer: 0, why: "BFS는 간선 수가 작은 경로부터 처리하므로 처음 도착한 거리가 최소입니다." }
+    quiz: { q: "가중치가 모두 같은 격자에서 최소 이동 횟수를 구할 때 기본 선택은?", options: ["정렬", "BFS", "DFS"], answer: 1, why: "BFS는 간선 수가 작은 경로부터 처리하므로 처음 도착한 거리가 최소입니다." }
   },
   {
     id: "graph-model",
@@ -64,7 +64,7 @@ window.CHAPTERS.push(
     check: ["간선은 방향이 있는가?", "간선에 비용이 있는가?", "V와 E 중 어느 쪽이 큰가?", "간선 존재 확인과 전체 이웃 순회 중 어느 연산이 잦은가?"],
     complexity: "인접 리스트 O(V+E) 공간 · BFS/DFS O(V+E), 인접 행렬 O(V²) 공간",
     code: "struct Edge { int to; long long cost; };\nvector<vector<Edge>> adj(n);\n// 방향 간선 u -> v\nadj[u].push_back({v, w});\n// 무방향이면 반대 방향도 추가\nadj[v].push_back({u, w});\n\nvector<char> seen(n, false);\nqueue<int> q;\nseen[start] = true; q.push(start);\nwhile (!q.empty()) {\n    int u = q.front(); q.pop();\n    for (const Edge& e : adj[u]) {\n        if (seen[e.to]) continue;\n        seen[e.to] = true;\n        q.push(e.to);\n    }\n}",
-    quiz: { q: "간선 수가 정점 수보다 훨씬 적은 큰 그래프에서 기본으로 고려할 표현은?", options: ["인접 리스트", "인접 행렬", "정점 쌍마다 길이 V의 배열"], answer: 0, why: "인접 리스트는 실제 간선 수에 비례하는 공간 O(V+E)로 저장하고 이웃만 순회합니다." }
+    quiz: { q: "간선 수가 정점 수보다 훨씬 적은 큰 그래프에서 기본으로 고려할 표현은?", options: ["인접 행렬", "정점 쌍마다 길이 V의 배열", "인접 리스트"], answer: 2, why: "인접 리스트는 실제 간선 수에 비례하는 공간 O(V+E)로 저장하고 이웃만 순회합니다." }
   },
   {
     id: "shortest-variants",
@@ -77,7 +77,7 @@ window.CHAPTERS.push(
     example: "한 출발점에서 여러 목적지: Dijkstra 또는 Bellman-Ford. 모든 쌍: 작은 V에서 Floyd-Warshall.",
     sections: [
       ["Dijkstra: 음수 간선이 없을 때", "dist[start]=0으로 두고 최소 힙에서 현재 거리가 가장 작은 상태를 꺼내 이웃 간선을 완화합니다. 가중치가 음수가 없으면 가장 작은 거리로 꺼낸 정점의 거리는 확정됩니다. C++ priority_queue는 기본 최대 힙이므로 greater를 쓰거나 거리 부호를 바꿔야 합니다. 힙 안에 이전 거리 상태가 남으므로 d!=dist[u]이면 건너뜁니다. 인접 리스트와 이진 힙 구현은 O((V+E)log V) 정도입니다."],
-      ["Bellman-Ford: 음수 간선과 사이클", "출발점에서 도달 가능한 간선들을 V−1회 반복해 dist[v] > dist[u]+w이면 갱신합니다. 최단 단순 경로에는 최대 V−1개의 간선만 있기에 충분합니다. 한 번 더 완화 가능한 간선이 있으면 출발점에서 도달 가능한 음수 사이클이 존재합니다. dist[u]가 INF일 때 INF+w 연산을 하지 않도록 검사하고, 복잡도 O(VE)임을 입력 크기와 비교하세요."],
+      ["Bellman-Ford: 음수 간선과 사이클", "출발점에서 도달 가능한 간선들을 V−1회 반복해 dist[v] > dist[u]+w이면 갱신합니다. 최단 단순 경로에는 최대 V−1개의 간선만 있기에 충분합니다. 한 번 더 완화 가능한 간선이 있으면 출발점에서 도달 가능한 음수 사이클이 존재합니다. dist[u]가 INF일 때 INF+w 연산을 하지 않도록 검사합니다. 아래 코드는 간선 값과 모든 유한 중간 거리의 절댓값이 INF보다 작은 입력을 전제로 합니다. 음수 사이클이 있으면 같은 반복 안에서도 거리가 계속 감소하므로 최종 답의 범위만 확인해서는 충분하지 않습니다. Bellman-Ford에서는 V·max(1,E)·최대 |w| < INF가 충분한 보수적 조건입니다. 조건을 만족하지 않으면 더 넓은 중간 자료형과 INF 표현을 함께 설계해야 합니다. 복잡도 O(VE)임을 입력 크기와 비교하세요."],
       ["Floyd-Warshall: 모든 쌍", "dist[i][j]를 i에서 j까지의 현재 최선 비용으로 둡니다. k를 중간 정점으로 허용할 때 dist[i][j]=min(dist[i][j],dist[i][k]+dist[k][j])로 갱신합니다. 바깥 반복을 k로 두는 순서가 점화식의 의미를 보존합니다. 도달 불가 INF가 더해지지 않게 양쪽 경로를 확인해야 합니다. 음수 간선도 처리하지만 음수 사이클이 있으면 최단값이 정의되지 않으며, 갱신 후 dist[k][k]<0으로 감지할 수 있습니다. 시간 O(V³), 공간 O(V²)입니다."],
       ["INF와 경로 복원", "INF를 너무 작게 잡으면 유효한 비용보다 작아져 답이 틀리고, 너무 크게 잡아 두 INF를 더하면 signed overflow가 납니다. 충분히 큰 long long 상수와 도달 가능성 검사를 함께 사용하세요. 경로 자체가 필요하면 relax할 때 parent 또는 next 배열도 갱신합니다. 목적지가 하나이고 음수 간선이 없는지, 모든 쌍인지, 음수 사이클 탐지가 필요한지부터 확인하면 불필요한 알고리즘을 피할 수 있습니다."]
     ],
@@ -85,7 +85,7 @@ window.CHAPTERS.push(
     trap: "음수 간선이 있는데 Dijkstra를 쓰면 확정한 정점의 거리가 나중에 더 작아질 수 있습니다. INF 상태를 확인하지 않고 더하는 일도 피하세요.",
     check: ["한 출발점인가, 모든 쌍인가?", "음수 가중치가 있을 수 있는가?", "음수 사이클 존재 여부도 답해야 하는가?", "정점·간선 수에 맞는 시간복잡도인가?"],
     complexity: "Dijkstra O((V+E)log V), Bellman-Ford O(VE), Floyd-Warshall O(V³)",
-    code: "struct Edge { int u, v; long long w; };\nconst long long INF = (1LL << 62);\n\n// Bellman-Ford: 음수 간선 허용, start에서 도달 가능한 음수 사이클 감지\nbool bellmanFord(int n, int start, const vector<Edge>& edges,\n                 vector<long long>& dist) {\n    dist.assign(n, INF); dist[start] = 0;\n    for (int it = 0; it < n - 1; ++it) {\n        bool changed = false;\n        for (auto e : edges) {\n            if (dist[e.u] == INF) continue;\n            if (dist[e.v] > dist[e.u] + e.w) {\n                dist[e.v] = dist[e.u] + e.w;\n                changed = true;\n            }\n        }\n        if (!changed) break;\n    }\n    for (auto e : edges)\n        if (dist[e.u] != INF && dist[e.v] > dist[e.u] + e.w)\n            return false; // reachable negative cycle\n    return true;\n}\n\n// Floyd-Warshall core: dist initialized with 0 diagonal and INF otherwise\nfor (int k = 0; k < n; ++k)\n    for (int i = 0; i < n; ++i) if (dist[i][k] != INF)\n        for (int j = 0; j < n; ++j) if (dist[k][j] != INF)\n            dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);",
+    code: "struct Edge { int u, v; long long w; };\nconst long long INF = (1LL << 62);\n\n// 입력 전제: 모든 |w|와 유한 중간 |dist| < INF (합은 long long 범위)\n// Bellman-Ford: 음수 간선 허용, start에서 도달 가능한 음수 사이클 감지\nbool bellmanFord(int n, int start, const vector<Edge>& edges,\n                 vector<long long>& dist) {\n    dist.assign(n, INF); dist[start] = 0;\n    for (int it = 0; it < n - 1; ++it) {\n        bool changed = false;\n        for (auto e : edges) {\n            if (dist[e.u] == INF) continue;\n            if (dist[e.v] > dist[e.u] + e.w) {\n                dist[e.v] = dist[e.u] + e.w;\n                changed = true;\n            }\n        }\n        if (!changed) break;\n    }\n    for (auto e : edges)\n        if (dist[e.u] != INF && dist[e.v] > dist[e.u] + e.w)\n            return false; // reachable negative cycle\n    return true;\n}\n\n// Floyd도 모든 유한 중간 거리의 절댓값 < INF를 전제로 함\n// Floyd-Warshall core: dist initialized with 0 diagonal and INF otherwise\nfor (int k = 0; k < n; ++k)\n    for (int i = 0; i < n; ++i) if (dist[i][k] != INF)\n        for (int j = 0; j < n; ++j) if (dist[k][j] != INF)\n            dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);",
     quiz: { q: "음수 간선이 존재할 수 있고 한 출발점에서 도달 가능한 음수 사이클도 검출해야 합니다. 무엇을 쓸까요?", options: ["Bellman-Ford", "Dijkstra", "Floyd-Warshall만 가능"], answer: 0, why: "Bellman-Ford는 음수 간선을 허용하며 V번째 완화 가능성으로 도달 가능한 음수 사이클을 확인합니다." }
   },
   {
@@ -108,7 +108,7 @@ window.CHAPTERS.push(
     check: ["질의·갱신 연산을 블록 요약으로 합칠 수 있는가?", "B와 N/B 사이 균형을 고려했는가?", "갱신된 블록 요약을 다시 맞췄는가?", "[l,r) 끝 경계가 일관적인가?"],
     complexity: "구축 O(N), 질의 O(B+N/B), 점 갱신 O(B) · B≈√N이면 각각 O(√N)",
     code: "struct SqrtMax {\n    int n, block;\n    vector<long long> a, best;\n    SqrtMax(vector<long long> v) : n(v.size()), a(move(v)) {\n        block = max(1, (int)sqrt(n) + 1);\n        best.assign((n + block - 1) / block, LLONG_MIN);\n        for (int i = 0; i < n; ++i)\n            best[i / block] = max(best[i / block], a[i]);\n    }\n    void update(int x, long long value) {\n        a[x] = value;\n        int b = x / block, l = b * block;\n        int r = min(n, l + block);\n        best[b] = LLONG_MIN;\n        for (int i = l; i < r; ++i) best[b] = max(best[b], a[i]);\n    }\n    long long query(int l, int r) { // [l,r), non-empty\n        long long ans = LLONG_MIN;\n        while (l < r && l % block != 0) ans = max(ans, a[l++]);\n        while (l + block <= r) {\n            ans = max(ans, best[l / block]);\n            l += block;\n        }\n        while (l < r) ans = max(ans, a[l++]);\n        return ans;\n    }\n};",
-    quiz: { q: "블록 크기 B일 때 경계 자투리와 내부 블록을 처리하는 질의 비용은 대략?", options: ["O(B+N/B)", "O(log N)", "항상 O(N²)"], answer: 0, why: "자투리는 최대 O(B), 포함 블록은 O(N/B)개이므로 두 비용의 합입니다." }
+    quiz: { q: "블록 크기 B일 때 경계 자투리와 내부 블록을 처리하는 질의 비용은 대략?", options: ["항상 O(N²)", "O(B+N/B)", "O(log N)"], answer: 1, why: "자투리는 최대 O(B), 포함 블록은 O(N/B)개이므로 두 비용의 합입니다." }
   },
   {
     id: "mst",
@@ -117,7 +117,7 @@ window.CHAPTERS.push(
     short: "모든 정점 연결 · 총 비용 최소",
     tag: "MST + UNION-FIND",
     lead: "사이클을 만들지 않으면서 가장 싼 간선을 차례로 선택합니다.",
-    problem: "가중치가 있는 무방향 그래프에서 모든 정점을 연결하는 간선 집합 중 총 비용이 최소인 값을 구하세요. 그래프가 연결되지 않을 수도 있습니다.",
+    problem: "가중치가 있는 무방향 그래프에서 사이클 없이 모든 정점을 연결하는 신장 트리 중 총 비용이 최소인 값을 구하세요. 그래프가 연결되지 않을 수도 있습니다.",
     example: "정점 4개, 간선 (1,2,1), (2,3,2), (1,3,4), (3,4,3) → 최소 비용 6",
     sections: [
       ["신장 트리의 조건", "신장 트리는 원래 그래프의 모든 정점을 포함하고 연결되어 있으며 사이클이 없는 부분 그래프입니다. 정점이 V개인 신장 트리는 간선이 정확히 V−1개입니다. 최소 신장 트리(MST)는 이 조건을 만족하는 트리 중 가중치 합이 최소인 것입니다. 그래프가 연결되지 않았다면 모든 정점을 하나로 연결하는 신장 트리는 존재하지 않습니다."],
@@ -130,7 +130,7 @@ window.CHAPTERS.push(
     check: ["그래프가 무방향 가중치 그래프인가?", "정점 V개에 대해 최대 V−1개를 선택하는가?", "Union-Find가 사이클을 막는가?", "선택 간선 수로 연결 여부를 판정했는가?"],
     complexity: "간선 정렬 O(E log E), Union-Find 처리 O(E α(V)) · 공간 O(V+E)",
     code: "struct Edge { int u, v; long long w; };\nstruct DSU {\n    vector<int> p, sz;\n    DSU(int n) : p(n), sz(n, 1) { iota(p.begin(), p.end(), 0); }\n    int find(int x) { return p[x] == x ? x : p[x] = find(p[x]); }\n    bool unite(int a, int b) {\n        a = find(a); b = find(b);\n        if (a == b) return false;\n        if (sz[a] < sz[b]) swap(a, b);\n        p[b] = a; sz[a] += sz[b];\n        return true;\n    }\n};\n\npair<long long,int> kruskal(int n, vector<Edge> edges) {\n    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {\n        return a.w < b.w;\n    });\n    DSU dsu(n); long long cost = 0; int used = 0;\n    for (const auto& e : edges) {\n        if (!dsu.unite(e.u, e.v)) continue;\n        cost += e.w;\n        if (++used == n - 1) break;\n    }\n    return {cost, used}; // used != n-1이면 연결 그래프가 아님\n}",
-    quiz: { q: "Kruskal에서 간선을 선택하기 전에 검사해야 할 조건은?", options: ["양 끝점이 서로 다른 Union-Find 집합인가", "가중치가 양수인가", "간선이 입력에서 가장 먼저 나왔는가"], answer: 0, why: "두 끝점이 이미 연결돼 있으면 해당 간선을 더하는 순간 사이클이 생깁니다." }
+    quiz: { q: "Kruskal에서 간선을 선택하기 전에 검사해야 할 조건은?", options: ["가중치가 양수인가", "간선이 입력에서 가장 먼저 나왔는가", "양 끝점이 서로 다른 Union-Find 집합인가"], answer: 2, why: "두 끝점이 이미 연결돼 있으면 해당 간선을 더하는 순간 사이클이 생깁니다." }
   },
   {
     id: "bitmask-subsets",
@@ -174,7 +174,7 @@ window.CHAPTERS.push(
     check: ["엄격 증가인가, 같은 값을 허용하는가?", "요구 출력이 길이뿐인가 실제 수열인가?", "tails가 길이별 최소 꼬리라는 의미를 유지하는가?", "복원 parent가 앞선 인덱스를 가리키는가?"],
     complexity: "꼬리 배열 O(N log N), 복원 공간 O(N) · O(N²) DP는 비교 기준용",
     code: "vector<int> lisOne(const vector<int>& a) {\n    int n = a.size();\n    if (n == 0) return {};\n    vector<int> tails, tailIndex;\n    vector<int> parent(n, -1);\n    for (int i = 0; i < n; ++i) {\n        int p = lower_bound(tails.begin(), tails.end(), a[i]) - tails.begin();\n        if (p > 0) parent[i] = tailIndex[p - 1];\n        if (p == (int)tails.size()) {\n            tails.push_back(a[i]);\n            tailIndex.push_back(i);\n        } else {\n            tails[p] = a[i];\n            tailIndex[p] = i;\n        }\n    }\n    vector<int> ans;\n    for (int at = tailIndex.back(); at != -1; at = parent[at])\n        ans.push_back(a[at]);\n    reverse(ans.begin(), ans.end());\n    return ans;\n}",
-    quiz: { q: "엄격 증가 LIS 길이를 tails로 계산할 때 x의 위치는?", options: ["lower_bound: 첫 번째 x 이상 위치", "upper_bound: 첫 번째 x 초과 위치", "배열의 마지막 위치"], answer: 0, why: "같은 값은 엄격 증가를 늘리지 않으므로 첫 번째 x 이상 위치를 교체합니다." }
+    quiz: { q: "엄격 증가 LIS 길이를 tails로 계산할 때 x의 위치는?", options: ["배열의 마지막 위치", "lower_bound: 첫 번째 x 이상 위치", "upper_bound: 첫 번째 x 초과 위치"], answer: 1, why: "같은 값은 엄격 증가를 늘리지 않으므로 첫 번째 x 이상 위치를 교체합니다." }
   },
   {
     id: "sweep-line",
@@ -196,7 +196,7 @@ window.CHAPTERS.push(
     check: ["구간 끝은 포함되는가?", "같은 좌표 이벤트의 적용 순서는 무엇인가?", "현재 필요한 정보는 개수인가, 활성 구간의 최솟값/최댓값인가?", "좌표 압축 후 원래 길이를 보존했는가?"],
     complexity: "정렬 O(N log N), 이벤트 순회 O(N) · 공간 O(N)",
     code: "int maxOverlap(vector<pair<int,int>> intervals) { // [l,r)\n    vector<pair<int,int>> events;\n    for (auto [l, r] : intervals) {\n        events.push_back({l, +1});\n        events.push_back({r, -1});\n    }\n    sort(events.begin(), events.end()); // 같은 좌표에서 -1 종료 우선\n    int active = 0, best = 0;\n    for (auto [x, delta] : events) {\n        active += delta;\n        best = max(best, active);\n    }\n    return best;\n}",
-    quiz: { q: "반열린 구간 [2,5)와 [5,8)은 겹치는 순간이 있는가?", options: ["없다", "시각 5에서 겹친다", "항상 겹친다"], answer: 0, why: "첫 구간은 5를 포함하지 않고 두 번째는 5부터 시작하므로 동시에 활성인 시각이 없습니다." }
+    quiz: { q: "반열린 구간 [2,5)와 [5,8)은 겹치는 순간이 있는가?", options: ["시각 5에서 겹친다", "항상 겹친다", "없다"], answer: 2, why: "첫 구간은 5를 포함하지 않고 두 번째는 5부터 시작하므로 동시에 활성인 시각이 없습니다." }
   },
   {
     id: "monotonic-stack",
@@ -240,7 +240,7 @@ window.CHAPTERS.push(
     check: ["업데이트는 순차적으로 일어나는가, 동시에 일어나는가?", "오늘과 내일 상태를 분리했는가?", "매 반복마다 방문·누적 상태를 초기화했는가?", "종료 조건이 반드시 만족되는가?"],
     complexity: "보통 하루 O(NM), D일 O(DNM) · 별도 다음 상태 공간 O(NM)",
     code: "vector<vector<int>> step(const vector<vector<int>>& cur) {\n    if (cur.empty() || cur[0].empty()) return {};\n    int n = cur.size(), m = cur[0].size();\n    vector<vector<int>> next = cur;\n    for (int r = 0; r < n; ++r) {\n        for (int c = 0; c < m; ++c) {\n            long long sum = 0; int cnt = 0;\n            const int dr[4] = {-1, 1, 0, 0};\n            const int dc[4] = {0, 0, -1, 1};\n            for (int d = 0; d < 4; ++d) {\n                int nr = r + dr[d], nc = c + dc[d];\n                if (nr < 0 || nr >= n || nc < 0 || nc >= m) continue;\n                sum += cur[nr][nc]; ++cnt;\n            }\n            if (cnt) next[r][c] = sum / cnt; // cur만 읽는다\n        }\n    }\n    return next;\n}",
-    quiz: { q: "하루의 모든 칸이 동시에 바뀌는 규칙에서 안전한 갱신 방식은?", options: ["현재 배열을 읽고 별도 다음 배열에 쓴 뒤 교체", "행마다 즉시 현재 배열을 덮어쓰기", "방문 배열을 생략"], answer: 0, why: "모든 계산이 같은 하루 시작 상태를 기준으로 해야 순회 순서에 영향을 받지 않습니다." }
+    quiz: { q: "하루의 모든 칸이 동시에 바뀌는 규칙에서 안전한 갱신 방식은?", options: ["방문 배열을 생략", "현재 배열을 읽고 별도 다음 배열에 쓴 뒤 교체", "행마다 즉시 현재 배열을 덮어쓰기"], answer: 1, why: "모든 계산이 같은 하루 시작 상태를 기준으로 해야 순회 순서에 영향을 받지 않습니다." }
   },
   {
     id: "modular-math",
@@ -252,17 +252,17 @@ window.CHAPTERS.push(
     problem: "정수 a와 매우 큰 지수 b, 1≤MOD≤1,000,000,007인 양의 정수 MOD가 주어집니다. b≥0일 때 a^b mod MOD를 계산하세요.",
     example: "3^13 mod 7 = 3",
     sections: [
-      ["모듈러의 곱셈 규칙", "(x+y) mod M은 ((x mod M)+(y mod M)) mod M이고 곱셈도 같은 방식으로 줄일 수 있습니다. 따라서 거듭제곱을 단계마다 MOD로 나누어 값 크기를 제한합니다. 음수 입력의 나머지는 언어에서 음수로 남을 수 있으니 (x%M+M)%M으로 0 이상 대표값으로 정규화합니다."],
+      ["모듈러의 곱셈 규칙", "(x+y) mod M은 ((x mod M)+(y mod M)) mod M이고 곱셈도 같은 방식으로 줄일 수 있습니다. 따라서 거듭제곱을 단계마다 MOD로 나누어 값 크기를 제한합니다. 음수 입력의 나머지는 언어에서 음수로 남을 수 있으니 M>0에서 r=x%M; if(r<0) r+=M;으로 0 이상 대표값으로 정규화합니다."],
       ["제곱을 반복해서 지수 줄이기", "b가 짝수면 a^b=(a^(b/2))², 홀수면 a^b=a·a^(b−1)입니다. 반복 제곱은 지수를 이진수로 읽으며 필요한 제곱만 곱해 O(log b)번 처리합니다. b=0일 때 결과는 1 mod M입니다. MOD=1도 결과가 항상 0으로 자연스럽게 처리됩니다."],
       ["정수 범위와 곱셈", "long long 값 두 개를 곱하면 MOD가 커도 중간 곱이 64비트 범위를 넘을 수 있습니다. MOD가 1e9+7 수준이면 곱은 약 1e18이라 signed 64-bit에 들어가지만, 더 큰 MOD에서는 __int128 같은 넓은 중간 타입이 필요합니다. 나머지를 더하는 단계도 자료형 범위를 검토하세요."],
-      ["모듈러 나눗셈은 별개", "덧셈·뺄셈·곱셈은 나머지 연산으로 옮길 수 있지만 일반 나눗셈은 바로 나머지를 취해도 동치가 아닙니다. MOD가 소수이고 분모가 0이 아닌 경우 페르마의 소정리로 역원 x^(MOD−2)을 사용할 수 있습니다. 이 조건이 없으면 gcd(x,MOD)=1인 경우 확장 유클리드 알고리즘으로 역원을 구해야 합니다."]
+      ["모듈러 나눗셈은 별개", "덧셈·뺄셈·곱셈은 나머지 연산으로 옮길 수 있지만 일반 나눗셈은 바로 나머지를 취해도 동치가 아닙니다. MOD가 소수이고 분모 x가 MOD의 배수가 아닌 경우(x % MOD != 0) 페르마의 소정리로 역원 x^(MOD−2)을 사용할 수 있습니다. 예를 들어 x=MOD는 정수로 0이 아니어도 나머지가 0이므로 역원이 없습니다. 이 조건이 없으면 gcd(x,MOD)=1인 경우 확장 유클리드 알고리즘으로 역원을 구해야 합니다."]
     ],
     invariant: "base와 result는 매 반복마다 MOD로 나눈 나머지이며, 처리하지 않은 지수 부분을 반영한다.",
     trap: "pow(a,b) 같은 실수 거듭제곱 함수는 정밀도 손실이 있고 정수 모듈러 답을 보장하지 않습니다.",
     check: ["지수 b가 0인 경우를 처리하는가?", "음수 입력의 나머지를 정규화했는가?", "곱셈 중간값이 자료형에 들어가는가?", "나눗셈을 역원 없이 모듈러 안에서 수행하지 않았는가?"],
     complexity: "O(log b) 시간 · O(1) 추가 공간",
     code: "long long modPow(long long a, long long b, long long mod) {\n    a %= mod;\n    if (a < 0) a += mod;\n    long long result = 1 % mod;\n    while (b > 0) {\n        if (b & 1) result = result * a % mod;\n        a = a * a % mod;\n        b >>= 1;\n    }\n    return result;\n}\n\n// 위 구현은 1 <= mod <= 1,000,000,007에서 곱셈이 long long에 안전",
-    quiz: { q: "빠른 거듭제곱에서 현재 지수의 최하위 비트가 1이면?", options: ["result에 현재 base를 곱한다", "result를 0으로 초기화한다", "base를 그대로 두고 종료한다"], answer: 0, why: "이진 표현에서 그 자리의 거듭제곱이 필요하므로 결과에 현재 base를 곱하고 나머지를 취합니다." }
+    quiz: { q: "빠른 거듭제곱에서 현재 지수의 최하위 비트가 1이면?", options: ["result를 0으로 초기화한다", "base를 그대로 두고 종료한다", "result에 현재 base를 곱한다"], answer: 2, why: "이진 표현에서 그 자리의 거듭제곱이 필요하므로 결과에 현재 base를 곱하고 나머지를 취합니다." }
   },
   {
     id: "fenwick-tree",
@@ -306,7 +306,7 @@ window.CHAPTERS.push(
     check: ["두 입력의 순서를 모두 유지하는가?", "빈 prefix의 초기값이 0인가?", "문자가 다를 때 두 방향 중 최댓값을 택하는가?", "실제 수열이 필요하면 역추적하는가?"],
     complexity: "시간 O(NM), 길이만 구하면 공간 O(min(N,M)) · 전체 표는 O(NM)",
     code: "int lcsLength(const string& a, const string& b) {\n    int n = a.size(), m = b.size();\n    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 1; j <= m; ++j) {\n            if (a[i - 1] == b[j - 1])\n                dp[i][j] = dp[i - 1][j - 1] + 1;\n            else\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);\n        }\n    }\n    return dp[n][m];\n}",
-    quiz: { q: "LCS에서 a[i-1]와 b[j-1]가 다를 때 점화식은?", options: ["max(dp[i-1][j], dp[i][j-1])", "dp[i-1][j-1]+1", "dp[i][j]=0으로 초기화"], answer: 0, why: "둘 중 하나의 마지막 문자를 버린 두 prefix 경우를 비교합니다." }
+    quiz: { q: "LCS에서 a[i-1]와 b[j-1]가 다를 때 점화식은?", options: ["dp[i][j]=0으로 초기화", "max(dp[i-1][j], dp[i][j-1])", "dp[i-1][j-1]+1"], answer: 1, why: "둘 중 하나의 마지막 문자를 버린 두 prefix 경우를 비교합니다." }
   },
   {
     id: "cpp-essentials",
@@ -329,7 +329,7 @@ window.CHAPTERS.push(
     check: ["줄 입력 전에 남은 개행을 처리했는가?", "큰 컨테이너를 읽기 전용 참조로 전달했는가?", "연산 전에 정수 타입을 승격했는가?", "비교자가 엄격한 순서를 만족하는가?"],
     complexity: "컨테이너 복사 회피 시 전달 비용 O(1); 실제 알고리즘 비용은 컨테이너 크기와 연산에 따름",
     code: "struct Item { int priority, id; };\nvector<Item> a;\nsort(a.begin(), a.end(), [](const Item& x, const Item& y) {\n    if (x.priority != y.priority) return x.priority > y.priority;\n    return x.id < y.id;\n});\n\nvoid process(const vector<long long>& values) {\n    // 읽기만 하므로 전체 복사 없음\n}\n\nint n; string line;\ncin >> n;\ncin.ignore(numeric_limits<streamsize>::max(), '\\n');\ngetline(cin, line);\nlong long product = 1LL * n * (n - 1);",
-    quiz: { q: "sort 비교자에서 같은 두 원소에 대해 false여야 하는 조건은?", options: ["엄격한 순서이므로 comp(x,x)는 false", "같으면 true", "비교자 결과는 무관"], answer: 0, why: "정렬 알고리즘은 엄격 약순서 비교를 기대합니다. <=처럼 같은 원소에 true인 비교자는 유효하지 않습니다." }
+    quiz: { q: "sort 비교자에서 같은 두 원소에 대해 false여야 하는 조건은?", options: ["같으면 true", "비교자 결과는 무관", "엄격한 순서이므로 comp(x,x)는 false"], answer: 2, why: "정렬 알고리즘은 엄격 약순서 비교를 기대합니다. <=처럼 같은 원소에 true인 비교자는 유효하지 않습니다." }
   },
   {
     id: "tree-traversal",
@@ -374,7 +374,7 @@ window.CHAPTERS.push(
     check: ["회전이 왼쪽/오른쪽 또는 시계/반시계 중 무엇인가?", "K를 원소 수로 나머지 처리했는가?", "직사각형 회전 뒤 행·열 크기를 교환했는가?", "변환 전 원본 값을 덮어쓰지 않았는가?"],
     complexity: "1D 회전 O(N), R×C 행렬 회전 O(RC) · 2D 변환 공간 O(RC)",
     code: "void rotateLeft(vector<int>& a, int k) {\n    if (a.empty()) return;\n    k %= a.size();\n    rotate(a.begin(), a.begin() + k, a.end());\n}\nvector<vector<int>> rotateClockwise(const vector<vector<int>>& a) {\n    int r = a.size();\n    if (r == 0) return {};\n    int c = a[0].size();\n    vector<vector<int>> b(c, vector<int>(r));\n    for (int i = 0; i < r; ++i)\n        for (int j = 0; j < c; ++j)\n            b[j][r - 1 - i] = a[i][j];\n    return b;\n}",
-    quiz: { q: "R×C 행렬을 90도 시계 방향으로 돌린 결과의 크기는?", options: ["C×R", "R×C", "(R+C)×(R+C)"], answer: 0, why: "원래 행 인덱스가 새 열 방향이 되고 원래 열 인덱스가 새 행 방향이 됩니다." }
+    quiz: { q: "R×C 행렬을 90도 시계 방향으로 돌린 결과의 크기는?", options: ["(R+C)×(R+C)", "C×R", "R×C"], answer: 1, why: "원래 행 인덱스가 새 열 방향이 되고 원래 열 인덱스가 새 행 방향이 됩니다." }
   }
 );
 
@@ -399,7 +399,7 @@ window.CHAPTERS.push(
     check: ["노드가 나타내는 구간 경계는 무엇인가?", "점 갱신 뒤 모든 조상 값을 다시 계산했는가?", "질의의 겹침 없음과 완전 포함을 구분했는가?", "배열 구간 갱신이 필요한데 lazy 처리를 빠뜨리진 않았는가?"],
     complexity: "구축 O(N), 점 대입 O(log N), 구간 질의 O(log N) · 공간 O(N)",
     code: "struct SegTree {\n    int n; vector<long long> t;\n    SegTree(const vector<long long>& a) : n(a.size()), t(4 * n) {\n        build(1, 0, n, a);\n    }\n    void build(int v, int l, int r, const vector<long long>& a) {\n        if (r - l == 1) { t[v] = a[l]; return; }\n        int m = (l + r) / 2;\n        build(v * 2, l, m, a); build(v * 2 + 1, m, r, a);\n        t[v] = t[v * 2] + t[v * 2 + 1];\n    }\n    void setValue(int pos, long long value, int v, int l, int r) {\n        if (r - l == 1) { t[v] = value; return; }\n        int m = (l + r) / 2;\n        if (pos < m) setValue(pos, value, v * 2, l, m);\n        else setValue(pos, value, v * 2 + 1, m, r);\n        t[v] = t[v * 2] + t[v * 2 + 1];\n    }\n    long long sum(int ql, int qr, int v, int l, int r) const {\n        if (qr <= l || r <= ql) return 0;\n        if (ql <= l && r <= qr) return t[v];\n        int m = (l + r) / 2;\n        return sum(ql, qr, v * 2, l, m) +\n               sum(ql, qr, v * 2 + 1, m, r);\n    }\n};",
-    quiz: { q: "세그먼트 트리에서 한 원소를 바꾼 뒤 갱신해야 하는 노드는?", options: ["해당 리프와 루트까지의 조상들", "리프만", "모든 리프"], answer: 0, why: "각 조상 구간의 합은 변경된 자식 값을 포함하므로 루트 경로를 따라 다시 계산합니다." }
+    quiz: { q: "세그먼트 트리에서 한 원소를 바꾼 뒤 갱신해야 하는 노드는?", options: ["리프만", "모든 리프", "해당 리프와 루트까지의 조상들"], answer: 2, why: "각 조상 구간의 합은 변경된 자식 값을 포함하므로 루트 경로를 따라 다시 계산합니다." }
   },
   {
     id: "lca",

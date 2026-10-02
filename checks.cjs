@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),cp=require('node:child_process'),os=require('node:os'),path=require('node:path');
-global.window={};vm.runInThisContext(fs.readFileSync('docs/engines.js','utf8'));for(const file of ['content','advanced','cases','service-cases'])vm.runInThisContext(fs.readFileSync('docs/'+file+'.js','utf8'));
+global.window={};vm.runInThisContext(fs.readFileSync('docs/engines.js','utf8'));for(const file of ['content','advanced','cases','service-cases','exercises'])vm.runInThisContext(fs.readFileSync('docs/'+file+'.js','utf8'));
 const {trace}=window.AlgoEngine,cs=window.CHAPTERS;
 const last=(kind,input)=>trace(kind,input).at(-1);
 let tests=0;const eq=(a,b)=>{assert.deepEqual(a,b);tests++};
@@ -44,7 +44,7 @@ for(const [kind,input] of [['dfs',{n:2,start:3,edges:''}],['trie',{words:'CAT',m
  assert.throws(()=>trace(kind,input));tests++;
 }
 eq(cs.length,45);eq(new Set(cs.map(c=>c.id)).size,cs.length);assert(window.MIXED.length>=15);eq(cs.filter(c=>c.lab).length,9);
-for(const c of cs){assert(c.code&&c.sections.length>=3&&c.quiz.options[c.quiz.answer]);for(const field of ['id','title','part','short','tag','lead','problem','example','invariant','trap','complexity'])assert(typeof c[field]==='string'&&c[field].length);assert(c.check.length>=3&&c.quiz.why&&c.quiz.answer>=0&&c.quiz.answer<c.quiz.options.length);tests++;}
+for(const c of cs){assert(c.code&&c.sections.length>=3&&c.quiz.options[c.quiz.answer]);for(const field of ['id','title','part','short','tag','lead','problem','example','invariant','trap','complexity'])assert(typeof c[field]==='string'&&c[field].length);for(const field of ['prompt','expected','why'])assert(typeof c.exercise?.[field]==='string'&&c.exercise[field].length,c.id+' exercise '+field);assert(c.check.length>=3&&c.quiz.why&&c.quiz.answer>=0&&c.quiz.answer<c.quiz.options.length);tests++;}
 // Compile the actual displayed snippets inside explicit input contexts.
 const pieces={
  thinking:cs.find(c=>c.id==='thinking').code+'\nvoid test(){assert(hasPair({4,1,7,3},10));assert(!hasPair({5},10));}',

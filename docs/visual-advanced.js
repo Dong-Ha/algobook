@@ -336,7 +336,7 @@ Object.assign(window.EXAMPLE_VISUALS, {
       },
       {
         "title": "핵심 원리 적용",
-        "note": "비용과 자원에서 각각 유리한 점이 있으므로 두 상태는 서로 지배하지 않습니다.",
+        "note": "추가 상태는 비용이 더 작고 자원도 두 기존 상태 이상입니다. 같은 위치이며 자원이 많아 불리해지지 않는 모델에서 두 상태를 지배합니다.",
         "rows": [
           {
             "label": "비용 3·자원 3 상태 추가",
@@ -369,7 +369,7 @@ Object.assign(window.EXAMPLE_VISUALS, {
       },
       {
         "title": "핵심 원리 적용",
-        "note": "OR는 두 집합의 합집합을 표현해 겹치는 위치도 한 비트로 남깁니다.",
+        "note": "XOR=0110에서 켜진 두 비트가 서로 다른 위치입니다. OR로 합집합을 세는 것과 구분합니다.",
         "rows": [
           {
             "label": "XOR",
@@ -520,3 +520,709 @@ Object.assign(window.EXAMPLE_VISUALS, {
     ]
   }
 });
+
+// 본문에서 설명한 핵심 전이와 경계 조건을 독립 입력으로 보충합니다.
+for (const [id, steps] of Object.entries({
+  "sqrt-decomposition": [
+    {
+      "title": "질의 [2,9): 자투리와 완전 블록",
+      "note": "독립 입력 [2,8,1,6,3,9,4,5,7,0], B=4입니다. 인덱스 2·3을 읽고 [4,8) 요약 9와 인덱스 8을 합칩니다.",
+      "rows": [
+        {
+          "label": "배열",
+          "values": [
+            2,
+            8,
+            1,
+            6,
+            3,
+            9,
+            4,
+            5,
+            7,
+            0
+          ],
+          "active": [
+            2,
+            3,
+            8
+          ],
+          "selected": [
+            4,
+            5,
+            6,
+            7
+          ]
+        },
+        {
+          "label": "블록 최대",
+          "values": [
+            8,
+            9,
+            7
+          ],
+          "active": [
+            1
+          ],
+          "selected": []
+        },
+        {
+          "label": "읽은 요약",
+          "values": [
+            1,
+            6,
+            9,
+            7
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "max(1,6,9,7) = 9"
+    },
+    {
+      "title": "최대 원소 감소: 블록 재계산",
+      "note": "A[5]=9를 0으로 낮추면 기존 최댓값 9만 빼서 복구할 수 없습니다. [4,8)의 네 원소를 다시 읽어 최대 5를 얻습니다.",
+      "rows": [
+        {
+          "label": "변경 배열",
+          "values": [
+            2,
+            8,
+            1,
+            6,
+            3,
+            0,
+            4,
+            5,
+            7,
+            0
+          ],
+          "active": [
+            5
+          ],
+          "selected": []
+        },
+        {
+          "label": "새 블록 최대",
+          "values": [
+            8,
+            5,
+            7
+          ],
+          "active": [
+            1
+          ],
+          "selected": []
+        },
+        {
+          "label": "질의 후보",
+          "values": [
+            1,
+            6,
+            5,
+            7
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "같은 [2,9) 질의 = 7"
+    }
+  ],
+  "shortest-variants": [
+    {
+      "title": "음수 간선: 반복 완화",
+      "note": "정점 0→1 비용 4, 0→2 비용 5, 1→2 비용 −3입니다. 이 순서로 한 번 완화하면 dist[2]는 5에서 1로 개선됩니다.",
+      "rows": [
+        {
+          "label": "시작 거리",
+          "values": [
+            0,
+            "∞",
+            "∞"
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "0→1 뒤",
+          "values": [
+            0,
+            4,
+            "∞"
+          ],
+          "active": [
+            1
+          ],
+          "selected": []
+        },
+        {
+          "label": "0→2 뒤",
+          "values": [
+            0,
+            4,
+            5
+          ],
+          "active": [
+            2
+          ],
+          "selected": []
+        },
+        {
+          "label": "1→2 뒤",
+          "values": [
+            0,
+            4,
+            1
+          ],
+          "active": [
+            2
+          ],
+          "selected": []
+        }
+      ],
+      "result": "0→1→2 비용 = 1"
+    },
+    {
+      "title": "한 번 더 개선되면 음수 사이클",
+      "note": "2→1 비용 1을 추가하면 1→2→1의 합은 −2입니다. 3개 정점의 V−1회 뒤에도 이 사이클의 거리 개선이 계속되어 유한한 최단값이 없습니다.",
+      "rows": [
+        {
+          "label": "사이클 비용",
+          "values": [
+            -3,
+            1
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "1의 비용 반복",
+          "values": [
+            4,
+            2,
+            0,
+            -2
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "출발점에서 도달 가능한 음수 사이클"
+    },
+    {
+      "title": "Floyd: 중간 정점 1을 허용",
+      "note": "0→1=4, 1→2=−3, 0→2=5인 원래 그래프입니다. k=1에서 dist[0][2]=min(5,4−3)=1로 바뀝니다. k는 바깥 반복입니다.",
+      "rows": [],
+      "grid": {
+        "label": "행 출발 · 열 도착: k=1 이후",
+        "values": [
+          [
+            "i/j",
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            0,
+            4,
+            1
+          ],
+          [
+            1,
+            "∞",
+            0,
+            -3
+          ],
+          [
+            2,
+            "∞",
+            "∞",
+            0
+          ]
+        ],
+        "active": [
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      "result": "dist[0][2] = 1"
+    }
+  ],
+  "dp-patterns": [
+    {
+      "title": "오름차순 갱신이 만드는 반례",
+      "note": "첫 물건 (무게 2, 가치 4)만 오름차순으로 처리하면 dp[4]가 방금 바꾼 dp[2]=4를 읽습니다. 한 물건을 두 번 쓴 8이 만들어집니다.",
+      "rows": [
+        {
+          "label": "용량",
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "올바른 역순",
+          "values": [
+            0,
+            0,
+            4,
+            4,
+            4
+          ],
+          "active": [],
+          "selected": [
+            4
+          ]
+        },
+        {
+          "label": "잘못된 오름차순",
+          "values": [
+            0,
+            0,
+            4,
+            4,
+            8
+          ],
+          "active": [
+            4
+          ],
+          "selected": []
+        }
+      ],
+      "result": "0/1 배낭에는 역순 필요"
+    },
+    {
+      "title": "조합과 순서 있는 경우의 수",
+      "note": "동전 [1,2], 금액 3입니다. 동전 바깥 루프는 1+2와 2+1을 같은 조합으로 세고, 금액 바깥 루프는 둘을 따로 셉니다.",
+      "rows": [
+        {
+          "label": "금액",
+          "values": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "조합 DP",
+          "values": [
+            1,
+            1,
+            2,
+            2
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "순서 있는 DP",
+          "values": [
+            1,
+            1,
+            2,
+            3
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "순서 있는 결과",
+          "values": [
+            "1+1+1",
+            "1+2",
+            "2+1"
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "조합 2개 · 순서 있는 경우 3개"
+    },
+    {
+      "title": "방문 집합과 마지막 정점 전이",
+      "note": "독립 방향 순회 0→1→2→0의 각 비용을 2,3,4로 둡니다. 비트 문자열은 오른쪽 비트가 정점 0입니다. 방문한 0으로 중간에 되돌아가지 않습니다.",
+      "rows": [
+        {
+          "label": "(mask, 마지막, 비용)",
+          "values": [
+            "(001,0,0)",
+            "(011,1,2)",
+            "(111,2,5)"
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "복귀 간선",
+          "values": [
+            4
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "모두 방문한 비용 5 + 복귀 4 = 9"
+    }
+  ],
+  "resource-state": [
+    {
+      "title": "다음 행동이 상태 차이를 드러냄",
+      "note": "같은 위치의 A=(비용 4, 자원 1), B=(비용 5, 자원 3)에서 다음 이동은 자원 2를 소비하고 비용 2를 더합니다. 비용이 낮은 A만 남기면 유효한 전이를 잃습니다.",
+      "rows": [
+        {
+          "label": "시작 상태",
+          "values": [
+            "A: (4,1)",
+            "B: (5,3)"
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "이동 가능 여부",
+          "values": [
+            false,
+            true
+          ],
+          "active": [],
+          "selected": [
+            1
+          ]
+        },
+        {
+          "label": "다음 상태",
+          "values": [
+            "A: 불가능",
+            "B: (7,1)"
+          ],
+          "active": [],
+          "selected": [
+            1
+          ]
+        }
+      ],
+      "result": "위치만 같은 두 상태를 합칠 수 없음"
+    }
+  ],
+  "bitset-cost": [
+    {
+      "title": "OR는 합집합, AND는 중복",
+      "note": "0101과 0011은 오른쪽 비트 0에서 겹칩니다. 개수를 각각 더한 4에서 중복 하나를 빼면 합집합 3입니다.",
+      "rows": [
+        {
+          "label": "A bits · 왼쪽부터 3,2,1,0",
+          "values": [
+            0,
+            1,
+            0,
+            1
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "B bits · 왼쪽부터 3,2,1,0",
+          "values": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "OR",
+          "values": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "active": [],
+          "selected": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "label": "AND",
+          "values": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "active": [
+            3
+          ],
+          "selected": []
+        },
+        {
+          "label": "합집합 개수",
+          "values": [
+            3
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "popcount(A OR B) = 3"
+    }
+  ],
+  "ordered-index": [
+    {
+      "title": "제거와 재삽입 사이",
+      "note": "기존 (8,2)를 제거한 직후에는 {(3,0)}만 남습니다. 본체의 점수를 1로 바꾸고 (1,2)를 넣으면 새 순서가 완성됩니다.",
+      "rows": [
+        {
+          "label": "삭제 직후",
+          "values": [
+            "(3,0)"
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "본체 ID 2의 점수",
+          "values": [
+            8,
+            "→",
+            1
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "재삽입 후",
+          "values": [
+            "(1,2)",
+            "(3,0)"
+          ],
+          "active": [],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "result": "한 객체당 현재 키 하나"
+    }
+  ],
+  "lazy-validity": [
+    {
+      "title": "오래된 top 제거 후 다시 검사",
+      "note": "힙 top 순서가 (우선순위 1, ID 7, 세대 2), (2, ID 9, 세대 1)입니다. ID 7의 현재 세대는 3, ID 9는 1이며 모두 활성입니다.",
+      "rows": [
+        {
+          "label": "pop 후보",
+          "values": [
+            "ID 7 · gen 2",
+            "ID 9 · gen 1"
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "현재 세대",
+          "values": [
+            3,
+            1
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "유효 여부",
+          "values": [
+            false,
+            true
+          ],
+          "active": [],
+          "selected": [
+            1
+          ]
+        }
+      ],
+      "result": "첫 항목 폐기 → 다음 유효 항목 ID 9 반환"
+    },
+    {
+      "title": "그룹 재활성화의 경계",
+      "note": "그룹 활성 여부만 false→true로 바꾸면 과거 항목도 다시 유효해질 수 있습니다. 새 그룹 수명은 그룹 세대로 구분하고 저장 세대와 현재 세대도 비교합니다.",
+      "rows": [
+        {
+          "label": "저장 그룹 세대",
+          "values": [
+            4
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "현재 그룹 세대",
+          "values": [
+            5
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "그룹 활성",
+          "values": [
+            true
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "최종 유효",
+          "values": [
+            false
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "그룹이 활성이어도 세대 불일치는 무효"
+    }
+  ],
+  "order-statistics": [
+    {
+      "title": "개수로 k번째 찾기",
+      "note": "값 영역 [2,4,7,9]의 빈도 [2,1,1,0]에서 1-based k=3을 찾습니다. 앞 두 개를 건너뛰면 남은 k=1이 값 4 영역 안에 있습니다.",
+      "rows": [
+        {
+          "label": "값 영역",
+          "values": [
+            2,
+            4,
+            7,
+            9
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "빈도",
+          "values": [
+            2,
+            1,
+            1,
+            0
+          ],
+          "active": [],
+          "selected": []
+        },
+        {
+          "label": "누적 개수",
+          "values": [
+            2,
+            3,
+            4,
+            4
+          ],
+          "active": [
+            1
+          ],
+          "selected": []
+        },
+        {
+          "label": "선택 값",
+          "values": [
+            4
+          ],
+          "active": [],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "result": "누적 개수가 처음 3 이상인 값 = 4"
+    },
+    {
+      "title": "삭제와 중복 순위",
+      "note": "값 2를 하나 지우면 빈도는 [1,1,1,0]이 됩니다. 4보다 작은 원소 수는 2에서 1로 줄고, 세 번째 원소는 7이 됩니다.",
+      "rows": [
+        {
+          "label": "갱신 빈도",
+          "values": [
+            1,
+            1,
+            1,
+            0
+          ],
+          "active": [
+            0
+          ],
+          "selected": []
+        },
+        {
+          "label": "갱신 누적 개수",
+          "values": [
+            1,
+            2,
+            3,
+            3
+          ],
+          "active": [
+            2
+          ],
+          "selected": []
+        },
+        {
+          "label": "rank(4) · select(3)",
+          "values": [
+            1,
+            7
+          ],
+          "active": [],
+          "selected": []
+        }
+      ],
+      "result": "유효 원소 수와 집계를 함께 갱신"
+    }
+  ]
+})) {
+  window.EXAMPLE_VISUALS[id].steps.push(...steps);
+}
+
+// 결과뿐 아니라 해당 셀·점프를 만드는 의존 관계를 따라갑니다.
+{
+  const full = window.EXAMPLE_VISUALS.lcs.steps[0].grid.values;
+  function cellStep(i, j, title, note, dependencies) {
+    const values = full.map((r, ri) => r.map((v, ci) =>
+      ri <= 1 || ci <= 1 || ri < i || (ri === i && ci <= j) ? v : '·'));
+    return {title, note, grid: {label: '행 우선 계산 · 주황은 현재 셀, 청록은 읽는 셀',
+      values, active: [[i,j]], selected: dependencies}};
+  }
+  window.EXAMPLE_VISUALS.lcs.steps.splice(1, 0,
+    cellStep(4,4,'문자가 같음: 대각선 + 1',
+      'A의 세 번째 문자 C와 B의 세 번째 문자 C가 같습니다. 빈 접두사와 제목 칸을 제외한 dp[3][3]은 dp[2][2]+1=1+1=2입니다. 아직 계산하지 않은 칸은 ·입니다.', [[3,3]]),
+    cellStep(4,5,'문자가 다름: 위·왼쪽 max',
+      'C와 A는 다릅니다. dp[3][4]=max(dp[2][4],dp[3][3])=max(1,2)=2입니다. 현재 문자를 둘 다 답에 넣지 않고 한쪽 접두사를 줄인 두 후보를 비교합니다.', [[3,5],[4,4]]),
+    {title:'답 수열과 원래 인덱스', note:'길이 4인 공통 부분수열 BCBA의 한 선택입니다. 두 문자열에서 선택 인덱스가 각각 증가해야 합니다. DP 길이와 실제 수열은 별개 정보입니다.',
+      rows:[{label:'ABCBDAB',values:[...'ABCBDAB'],selected:[1,2,3,5]},
+        {label:'BDCABA',values:[...'BDCABA'],selected:[0,2,4,5]}],result:'공통 부분수열 BCBA · 길이 4'});
+  window.EXAMPLE_VISUALS.lca.steps.push(
+    {title:'2의 거듭제곱 조상 표',note:'독립 예제는 1→2→3→4→5→6→7→8인 일자 트리, 루트 1의 깊이 0입니다. up[k][v]는 2^k칸 위 조상이고 루트 위 조상은 루트로 둡니다. up[k][v]=up[k−1][up[k−1][v]]로 채웁니다.',
+      rows:[{label:'정점 8의 점프 길이',values:[1,2,4,8]},
+        {label:'up[k][8]',values:[7,6,4,1]},
+        {label:'4칸 점프의 의존',values:['up[1][8]=6','up[1][6]=4']}]},
+    {title:'깊이 차 5 = 4 + 1',note:'LCA(8,3)를 구할 때 깊이 차는 7−2=5입니다. 정점 8을 4칸 올려 4, 1칸 더 올려 3이 됩니다. 두 정점이 같아졌으므로 즉시 반환합니다.',
+      rows:[{label:'점프 경로',values:[8,4,3],selected:[2]},
+        {label:'깊이',values:[7,3,2]},
+        {label:'사용 점프 길이',values:[4,1]}],result:'LCA(8,3) = 3'});
+}

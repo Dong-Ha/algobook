@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-global.window={};for(const file of ['content','advanced','cases','service-cases','engines','visuals','visual-advanced'])require('./docs/'+file+'.js');
+global.window={};for(const file of ['content','advanced','cases','service-cases','exercises','engines','visuals','visual-advanced'])require('./docs/'+file+'.js');
 const visuals=window.EXAMPLE_VISUALS;
 assert.deepEqual(Object.keys(visuals).sort(),window.CHAPTERS.map(c=>c.id).sort());
 let count=0;
@@ -30,4 +30,30 @@ assert.deepEqual(rowValues('order-statistics','개수'),[2]);
 
 const a='ABCBDAB',b='BDCABA',dp=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
 const lcsGrid=visuals.lcs.steps.find(s=>s.grid?.values.length===9)?.grid;assert(lcsGrid,'LCS must show the whole DP table');assert.deepEqual(lcsGrid.values.slice(1).map(r=>r.slice(1)),dp);assert.deepEqual(lcsGrid.values[0].slice(2),[...b]);assert.deepEqual(lcsGrid.values.slice(2).map(r=>r[0]),[...a]);assert.deepEqual(visuals.lcs.steps.find(s=>s.title.includes('마지막')).grid.selected,[[1,7]]);
+// Verify supplemental transitions with independent small calculations.
+const scene=(id,title)=>{const s=visuals[id].steps.find(s=>s.title===title);assert(s,id+' '+title);return s;};
+const vals=(s,label)=>{const r=s.rows.find(r=>r.label===label);assert(r,label);return r.values;};
+
+const sqBefore=scene('sqrt-decomposition','질의 [2,9): 자투리와 완전 블록'),sqAfter=scene('sqrt-decomposition','최대 원소 감소: 블록 재계산');
+const input=vals(sqBefore,'배열'),updated=vals(sqAfter,'변경 배열');
+for(const [s,a,label] of [[sqBefore,input,'블록 최대'],[sqAfter,updated,'새 블록 최대']]){
+ assert.deepEqual(vals(s,label),[0,4,8].map(l=>Math.max(...a.slice(l,l+4))));
+ assert.equal(Math.max(...vals(s,s===sqBefore?'읽은 요약':'질의 후보')),Math.max(...a.slice(2,9)));
+}
+const countWays=(ordered)=>{const d=[1,0,0,0];if(ordered){for(let x=1;x<=3;x++)for(const c of [1,2])if(x>=c)d[x]+=d[x-c];}else{for(const c of [1,2])for(let x=c;x<=3;x++)d[x]+=d[x-c];}return d;};
+const counts=scene('dp-patterns','조합과 순서 있는 경우의 수');
+assert.deepEqual(vals(counts,'조합 DP'),countWays(false));assert.deepEqual(vals(counts,'순서 있는 DP'),countWays(true));
+const bitUnion=scene('bitset-cost','OR는 합집합, AND는 중복');
+const aa=vals(bitUnion,'A bits · 왼쪽부터 3,2,1,0'),bb=vals(bitUnion,'B bits · 왼쪽부터 3,2,1,0');
+assert.deepEqual(vals(bitUnion,'OR'),aa.map((x,i)=>Number(Boolean(x||bb[i]))));
+assert.deepEqual(vals(bitUnion,'AND'),aa.map((x,i)=>Number(Boolean(x&&bb[i]))));
+assert.equal(vals(bitUnion,'합집합 개수')[0],vals(bitUnion,'OR').reduce((a,b)=>a+b,0));
+const same=scene('lcs','문자가 같음: 대각선 + 1').grid,different=scene('lcs','문자가 다름: 위·왼쪽 max').grid;
+assert.equal(same.values[4][4],same.values[3][3]+1);assert.deepEqual(same.selected,[[3,3]]);
+assert.equal(different.values[4][5],Math.max(different.values[3][5],different.values[4][4]));assert.deepEqual(different.selected,[[3,5],[4,4]]);
+const lcaTable=scene('lca','2의 거듭제곱 조상 표');assert.deepEqual(vals(lcaTable,'up[k][8]'),[1,2,4,8].map(j=>Math.max(1,8-j)));
+const kth=scene('order-statistics','개수로 k번째 찾기'),deleted=scene('order-statistics','삭제와 중복 순위');
+for(const [s,label]of [[kth,'빈도'],[deleted,'갱신 빈도']]){let sum=0;const cumulative=vals(s,label).map(x=>sum+=x);assert.deepEqual(vals(s,s===kth?'누적 개수':'갱신 누적 개수'),cumulative);}
+const sortedAfter=[2,4,7];assert.deepEqual(vals(deleted,'rank(4) · select(3)'),[sortedAfter.filter(x=>x<4).length,sortedAfter[2]]);
+assert(window.MIXED.every(q=>!window.CHAPTERS.some(c=>c.quiz.q===q.q)),'Mixed practice must use independent questions');
 console.log(JSON.stringify({chapters:window.CHAPTERS.length,visualSteps:count,engineExamples:11,conceptDiagrams:conceptIds.length,lcsTable:'passed',status:'passed'}));
