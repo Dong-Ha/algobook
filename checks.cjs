@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),cp=require('node:child_process'),os=require('node:os'),path=require('node:path');
-global.window={};vm.runInThisContext(fs.readFileSync('dist/engines.js','utf8'));vm.runInThisContext(fs.readFileSync('dist/content.js','utf8'));
+global.window={};vm.runInThisContext(fs.readFileSync('docs/engines.js','utf8'));vm.runInThisContext(fs.readFileSync('docs/content.js','utf8'));
 const {trace}=window.AlgoEngine,cs=window.CHAPTERS;
 const last=(kind,input)=>trace(kind,input).at(-1);
 let tests=0;const eq=(a,b)=>{assert.deepEqual(a,b);tests++};
@@ -70,5 +70,4 @@ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'algobook-check-'));fs.writeFile
 cp.execFileSync('g++',['-std=c++17','-O2',temp+'/check.cpp','-o',temp+'/check']);cp.execFileSync(temp+'/check');
 fs.rmSync(temp,{recursive:true,force:true});
 console.log(JSON.stringify({assertions:tests,cppSnippets:15,status:'passed'}));
-
 

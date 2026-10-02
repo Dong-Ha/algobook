@@ -14,7 +14,7 @@ C++ 기초 문법을 아는 학습자를 위한 실버·골드 코딩테스트 �
 별도 패키지 설치나 빌드가 필요 없는 정적 웹사이트입니다.
 
 ```bash
-python3 -m http.server 8000 --directory dist
+python3 -m http.server 8000 --directory docs
 ```
 
 브라우저에서 http://localhost:8000 을 엽니다.
@@ -23,11 +23,11 @@ python3 -m http.server 8000 --directory dist
 
 | 파일 | 역할 |
 |---|---|
-| `dist/index.html` | 기본 문서와 내비게이션 |
-| `dist/style.css` | 반응형 레이아웃과 스타일 |
-| `dist/content.js` | 본문, C++ 코드, 문제와 해설 |
-| `dist/engines.js` | 단계별 알고리즘 상태 생성 |
-| `dist/app.js` | 화면, 입력, 재생과 시각화 |
+| `docs/index.html` | 기본 문서와 내비게이션 |
+| `docs/style.css` | 반응형 레이아웃과 스타일 |
+| `docs/content.js` | 본문, C++ 코드, 문제와 해설 |
+| `docs/engines.js` | 단계별 알고리즘 상태 생성 |
+| `docs/app.js` | 화면, 입력, 재생과 시각화 |
 | `checks.cjs` | 알고리즘 검증 및 C++ 예제 컴파일·실행 |
 
 ## 검증
@@ -44,7 +44,8 @@ node checks.cjs
 
 ## 편집
 
-본문·문제를 수정하려면 `dist/content.js`, 알고리즘 동작을 수정하려면 `dist/engines.js`, 시각화·화면을 수정하려면 `dist/app.js`를 편집합니다.
+본문·문제를 수정하려면 `docs/content.js`, 알고리즘 동작을 수정하려면 `docs/engines.js`, 시각화·화면을 수정하려면 `docs/app.js`를 편집합니다.
 
-이 저장소는 소스 보관용입니다. GitHub 업로드만으로 기존 게시 사이트가 자동 갱신되지는 않습니다.
+사이트: https://dong-ha.github.io/algobook/
 
+GitHub Pages는 `main` 브랜치의 `/docs` 폴더를 게시 원본으로 사용합니다. `main`에 푸시하면 사이트가 자동으로 배포됩니다.
