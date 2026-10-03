@@ -1226,3 +1226,277 @@ for (const [id, steps] of Object.entries({
         {label:'깊이',values:[7,3,2]},
         {label:'사용 점프 길이',values:[4,1]}],result:'LCA(8,3) = 3'});
 }
+
+// Curated semantic hints for the shared walkthrough renderer. Row labels and
+// cell captions are explicit so only true sequence/bit indices are displayed.
+{
+  const families = {
+    'stl-performance':'sequence','grid-search':'graph','graph-model':'graph','shortest-variants':'graph',
+    'sqrt-decomposition':'sequence','mst':'graph','bitmask-subsets':'bitset','lis':'sequence',
+    'sweep-line':'timeline','monotonic-stack':'frontier','simulation-phases':'dependency',
+    'modular-math':'bitset','fenwick-tree':'dependency','lcs':'dependency','cpp-essentials':'sequence',
+    'tree-traversal':'tree','array-rotation':'mapping','segment-tree':'tree','lca':'tree',
+    'dp-patterns':'dependency','state-model':'mapping','local-update':'dependency',
+    'candidate-filter':'mapping','path-algebra':'graph','path-sensitivity':'graph',
+    'resource-state':'state-space','bitset-cost':'bitset','ordered-index':'mapping',
+    'lazy-validity':'frontier','order-statistics':'tree'
+  };
+  const rowKinds = {
+    'stl-performance':{'a':'array','배치 예':'array'},
+    'grid-search':{'dist':'array'},
+    'graph-model':{'adj[1]':'array','adj[2]':'array'},
+    'shortest-variants':{'시작 거리':'array','0→1 뒤':'array','0→2 뒤':'array','1→2 뒤':'array','사이클 비용':'array','1의 비용 반복':'array'},
+    'sqrt-decomposition':{'index':'array','블록':'array','배열':'array','블록 최대':'array','읽은 요약':'array','변경 배열':'array','새 블록 최대':'array','질의 후보':'array'},
+    'mst':{'누적 비용':'array'},
+    'bitmask-subsets':{'작업 번호':'array','mask':'bitset','작업':'bitset'},
+    'lis':{'입력':'array','tails':'array','최종 tails':'array'},
+    'sweep-line':{'시각 4 처리':'array'},
+    'monotonic-stack':{'값':'array','스택 인덱스':'stack','결과':'array','다음 큰 값':'array'},
+    'simulation-phases':{'오늘':'array','다음 버퍼':'array','내일':'array'},
+    'modular-math':{'bit':'bitset','제곱 값 mod 7':'array','누적':'array'},
+    'fenwick-tree':{'원본 A':'array','Fenwick bit':'array','bit':'array','prefix':'state','range sum':'state'},
+    'lcs':{'ABCBDAB':'array','BDCABA':'array'},
+    'cpp-essentials':{'입력 버퍼':'array','읽기 결과':'array'},
+    'tree-traversal':{'전위':'array','중위':'array','후위':'array','레벨':'array'},
+    'array-rotation':{'입력':'array','결과':'array'},
+    'segment-tree':{'레벨 0':'array','레벨 1':'array','리프':'array'},
+    'lca':{'정점 8의 점프 길이':'array','up[k][8]':'array','4칸 점프의 의존':'state','점프 경로':'array','깊이':'array','사용 점프 길이':'array'},
+    'dp-patterns':{'capacity':'array','dp':'array','dp final':'array','용량':'array','올바른 역순':'array','잘못된 오름차순':'array','금액':'array','조합 DP':'array','순서 있는 DP':'array'},
+    'state-model':{'ID':'array','저장 위치':'array','삭제 뒤 ID':'array','조회 42':'state'},
+    'local-update':{'배열':'array','인접 합':'array','변경 배열':'array','새 인접 합':'array'},
+    'candidate-filter':{'후보':'array','활성':'array','최종 결과':'array'},
+    'path-algebra':{'경로 A':'array','경로 B':'array','각 경로 품질':'array','선택 품질':'state'},
+    'path-sensitivity':{'증거 경로 비용':'array','다른 경로 비용':'array','증거 경로 유지':'state','다른 간선 삭제 후 최적값':'state'},
+    'resource-state':{'비용':'array','자원':'array','비용 3·자원 3 상태 추가':'state','시작 상태':'state','이동 가능 여부':'state','다음 상태':'state'},
+    'bitset-cost':{'특징':'bitset','XOR':'bitset','차이 수':'state','A bits · 왼쪽부터 3,2,1,0':'bitset','B bits · 왼쪽부터 3,2,1,0':'bitset','OR':'bitset','AND':'bitset','합집합 개수':'state'},
+    'ordered-index':{'정렬 키':'array','새 정렬 키':'array','삭제 직후':'array','본체 ID 2의 점수':'state','재삽입 후':'array'},
+    'lazy-validity':{'활성':'state','그룹 활성':'state','세대':'array','유효 판정':'state','pop 후보':'queue','현재 세대':'array','유효 여부':'state','저장 그룹 세대':'array','현재 그룹 세대':'array','최종 유효':'state'},
+    'order-statistics':{'정렬 배열':'array','7보다 작은 값':'array','개수':'state','값 영역':'array','빈도':'array','누적 개수':'array','선택 값':'state','갱신 빈도':'array','갱신 누적 개수':'array','rank(4) · select(3)':'state'}
+  };
+  const indices = {
+    'stl-performance':{'a':['0','1','2','3','4'],'배치 예':['0','1','2','3','4']},
+    'grid-search':{'dist':['S','T']},
+    'sqrt-decomposition':{'index':['0','1','2','3','4','5','6','7','8','9'],'블록':['0','1','2','3','4','5','6','7','8','9'],'배열':['0','1','2','3','4','5','6','7','8','9'],'변경 배열':['0','1','2','3','4','5','6','7','8','9']},
+    'bitmask-subsets':{'작업 번호':['작업 0','작업 1','작업 2','작업 3','작업 4'],'mask':['작업 0','작업 1','작업 2','작업 3','작업 4'],'작업':['작업 0','작업 1','작업 2','작업 3','작업 4']},
+    'lis':{'입력':['0','1','2','3','4','5'],'tails':['LIS 길이 1','LIS 길이 2','LIS 길이 3'],'최종 tails':['LIS 길이 1','LIS 길이 2','LIS 길이 3','LIS 길이 4']},
+    'modular-math':{'bit':['bit 0','bit 1','bit 2','bit 3'],'제곱 값 mod 7':['3¹','3²','3⁴','3⁸'],'누적':['1번째 선택 항','2번째 선택 항','3번째 선택 항']},
+    'mst':{'누적 비용':['edge 1','edge 2']},
+    'monotonic-stack':{'값':['0','1','2','3','4'],'스택 인덱스':['index 0','index 2'],'결과':['0','1','2','3','4'],'다음 큰 값':['0','1','2','3','4']},
+    'fenwick-tree':{'원본 A':['A[0]','A[1]','A[2]','A[3]'],'Fenwick bit':['bit[1]','bit[2]','bit[3]','bit[4]'],'bit':['bit[1]','bit[2]','bit[3]','bit[4]']},
+    'lcs':{'ABCBDAB':['A[0]','A[1]','A[2]','A[3]','A[4]','A[5]','A[6]'],'BDCABA':['B[0]','B[1]','B[2]','B[3]','B[4]','B[5]']},
+    'array-rotation':{'입력':['0','1','2','3','4'],'결과':['0','1','2','3','4']},
+    'dp-patterns':{'capacity':['0','1','2','3','4'],'dp':['0','1','2','3','4'],'dp final':['0','1','2','3','4'],'용량':['0','1','2','3','4'],'금액':['0','1','2','3']},
+    'bitset-cost':{'특징':['f3','f2','f1','f0'],'XOR':['f3','f2','f1','f0'],'A bits · 왼쪽부터 3,2,1,0':['3','2','1','0'],'B bits · 왼쪽부터 3,2,1,0':['3','2','1','0'],'OR':['3','2','1','0'],'AND':['3','2','1','0']},
+    'order-statistics':{'정렬 배열':['0','1','2','3'],'값 영역':['값 2','값 4','값 7','값 9'],'빈도':['값 2','값 4','값 7','값 9'],'누적 개수':['값 2','값 4','값 7','값 9'],'갱신 빈도':['값 2','값 4','값 7','값 9'],'갱신 누적 개수':['값 2','값 4','값 7','값 9']}
+  };
+  for (const [id, family] of Object.entries(families)) {
+    const visual = window.EXAMPLE_VISUALS[id];
+    if (!visual) continue;
+    for (const s of visual.steps) {
+      s.renderer = family;
+      for (const row of s.rows || []) {
+        row.type = rowKinds[id]?.[row.label] || 'state';
+        if (indices[id]?.[row.label]) row.indices = indices[id][row.label];
+      }
+    }
+  }
+
+  const fenwick = window.EXAMPLE_VISUALS['fenwick-tree'].steps;
+  fenwick[0].graph = {nodes:[
+    {id:1,label:'1',caption:'bit[1] = 2',x:90,y:55},{id:2,label:'2',caption:'bit[2] = 3',x:230,y:55},
+    {id:3,label:'3',caption:'bit[3] = 4 · 갱신',active:true,x:370,y:55},{id:4,label:'4',caption:'bit[4] = 10 · 갱신',active:true,x:510,y:55}
+  ],edges:[{from:1,to:2},{from:2,to:4,active:true},{from:3,to:4,active:true}]};
+  fenwick[0].flow = {label:'점 갱신 · 1-based BIT 인덱스',items:['3 (+5)','4 (+5)','8: 범위 밖에서 종료']};
+  fenwick[0].hiddenRows = ['Fenwick bit'];
+  fenwick[1].flow = {label:'prefix(4) − prefix(1)',items:['4 → 0','1 → 0','15 − 2 = 13']};
+  fenwick[1].graph = {nodes:[
+    {id:4,label:'4',caption:'prefix(4) reads bit[4]=15',active:true,x:150,y:90},
+    {id:1,label:'1',caption:'prefix(1) reads bit[1]=2',selected:true,x:450,y:90},
+    {id:0,label:'0',caption:'stop',x:300,y:210}
+  ],edges:[{from:4,to:0,label:'next = 0',directed:true,active:true},{from:1,to:0,label:'next = 0',directed:true,selected:true}]};
+  fenwick[1].hiddenRows = ['bit','prefix'];
+
+  const segment = window.EXAMPLE_VISUALS['segment-tree'].steps;
+  const segmentGraph = updated => ({nodes:[
+    {id:1,label:'S',caption:updated?'sum 13 · [0,4)':'sum 10 · [0,4)',active:updated,x:300,y:35},
+    {id:2,label:'L',caption:'sum 3 · [0,2)',x:170,y:115},{id:3,label:'R',caption:updated?'sum 10 · [2,4)':'sum 7 · [2,4)',selected:true,active:updated,x:430,y:115},
+    {id:4,label:'LL',caption:'2 · [0,1)',x:90,y:205},{id:5,label:'LR',caption:'1 · [1,2) · query',selected:true,x:250,y:205},
+    {id:6,label:'RL',caption:updated?'7 · [2,3) · update':'4 · [2,3)',active:updated,x:390,y:205},
+    {id:7,label:'RR',caption:'3 · [3,4)',x:510,y:205}
+  ],edges:[{from:1,to:2,active:updated},{from:1,to:3,selected:true,active:updated},{from:2,to:4},{from:2,to:5,selected:true},{from:3,to:6,active:updated},{from:3,to:7}]});
+  segment[0].graph = segmentGraph(false);
+  segment[0].flow = {label:'질의 [1,4) · 완전 노드로 덮기',items:['[1,2): 1','[2,4): 7','1 + 7 = 8']};
+  segment[0].hiddenRows = ['레벨 0','레벨 1','리프'];
+  segment[1].graph = segmentGraph(true);
+  segment[1].flow = {label:'A[2] = 7 · 리프에서 루트로 재계산',items:['[2,3): 4 → 7','[2,4): 7 → 10','[0,4): 10 → 13']};
+  segment[1].hiddenRows = ['레벨 0','레벨 1','리프'];
+
+  const mono = window.EXAMPLE_VISUALS['monotonic-stack'].steps;
+  mono[0].rows[1].values = [0,2];
+  mono[0].rows[1].indices = ['index 0','index 2'];
+  mono.splice(1,0,{title:'4가 두 후보를 pop',
+    note:'현재 값 4는 stack top의 값 2보다 큽니다. 인덱스 2와 0을 차례로 꺼내 각각의 다음 큰 값에 4를 기록합니다.',
+    renderer:'frontier',rows:[{label:'현재 값',values:[4],type:'state'},
+      {label:'pop 순서',values:[2,0],type:'stack',indices:['index 2','index 0']},
+      {label:'결과에 기록',values:['ans[2]=4','ans[0]=4'],type:'array'}],
+    flow:{label:'stack pop → 답 확정 → push current',items:['index 2 → answer 4','index 0 → answer 4','push index 3']},result:'stack = [3]'});
+  mono[1].flow = {label:'현재 값 4가 해결한 후보',items:['index 2 → answer 4','index 0 → answer 4']};
+  mono[2].note = '값 4가 앞의 두 2를 pop해 답 4를 기록했습니다. index 1의 값 1은 다음 큰 값 2가 이미 확정됐고, 마지막 3은 미해결로 남아 -1입니다.';
+
+  const lis = window.EXAMPLE_VISUALS.lis.steps;
+  lis[0].flow = {label:'tails 갱신',items:['10 → tails[0]','20 → tails[1]','10 → tails[0] 교체','30 → tails[2] 추가']};
+  lis[1].flow = {label:'마지막 입력 처리',items:['20 → tails[1] 교체','50 → tails[3] 추가']};
+
+  const sweep = window.EXAMPLE_VISUALS['sweep-line'].steps[1];
+  sweep.timeline = {cursor:4,boundary:true};
+  sweep.flow = {label:'시각 4의 이벤트 순서',items:['A 종료 · 활성 −1','C 시작 · 활성 +1','동시 구간 수 2']};
+
+  const mst = window.EXAMPLE_VISUALS.mst.steps;
+  mst[0].graph.edges[3].active = true;
+  mst[1].graph.edges[2].discarded = true;
+  mst[1].graph.edges[2].active = true;
+  mst[1].flow = {label:'가중치 4 간선 검사',items:['find(1) = find(3)','같은 성분이므로 거절','간선 폐기']};
+
+  const lca = window.EXAMPLE_VISUALS.lca.steps;
+  const chain = highlight => ({nodes:[1,2,3,4,5,6,7,8].map((v,i)=>({id:v,label:String(v),x:75+i*70,y:100,selected:highlight&&[3,4,8].includes(v)})),
+    edges:[1,2,3,4,5,6,7].map(v=>({from:v,to:v+1,selected:highlight&&[3,4].includes(v)}))});
+  lca[3].graph = chain(false);
+  lca[3].flow = {label:'up[k][v] 구성 의존',items:['up[1][8] = 6','up[1][6] = 4','up[2][8] = 4']};
+  lca[4].graph = chain(true);
+  lca[4].flow = {label:'깊이 차 맞추기 · LCA(8,3)',items:['8 − 4칸 → 4','4 − 1칸 → 3','같은 정점이므로 반환']};
+  lca[4].graph.edges.push(
+    {from:8,to:4,label:'4칸 점프',directed:true,selected:true},
+    {from:4,to:3,label:'1칸 점프',directed:true,selected:true}
+  );
+
+  for (const node of lca[1].graph.nodes) if (['4','5'].includes(String(node.id))) node.active = true;
+  for (const node of lca[2].graph.nodes) if (['4','3'].includes(String(node.id))) node.active = true;
+  lca[3].graph.edges.push(
+    {from:8,to:6,label:'2칸 조상',directed:true,dependency:true},
+    {from:8,to:4,label:'4칸 조상',directed:true,dependency:true}
+  );
+
+  for (const s of window.EXAMPLE_VISUALS.lcs.steps) if (s.grid) s.grid.headers = true;
+  const lcs = window.EXAMPLE_VISUALS.lcs.steps;
+  lcs[1].grid.dependency = [[3,3]];
+  lcs[1].flow = {label:'dp[3][3] · 일치하는 C',items:['dp[2][2] = 1','같은 문자 → 대각선 + 1','dp[3][3] = 2']};
+  lcs[2].grid.dependency = [[3,5],[4,4]];
+  lcs[2].flow = {label:'dp[3][4] · C와 A가 다름',items:['dp[2][4] = 1 (위)','dp[3][3] = 2 (왼쪽)','max(1,2) = 2']};
+
+  const masks = window.EXAMPLE_VISUALS['bitmask-subsets'].steps;
+  masks[1].rows.find(r=>r.label==='작업').type = 'state';
+  masks[1].hiddenRows = ['작업'];
+  masks[1].rows.push({label:'완료 비트',values:[0,1,0,1,0],type:'bitset',indices:['작업 0','작업 1','작업 2','작업 3','작업 4']});
+
+  const bitset = window.EXAMPLE_VISUALS['bitset-cost'].steps;
+  bitset[0].rows[0].type = 'state';
+  delete bitset[0].rows[0].indices;
+  bitset[0].hiddenRows = ['특징'];
+  bitset[0].rows.push(
+    {label:'A bits',values:[0,1,0,1],type:'bitset',indices:['bit 3','bit 2','bit 1','bit 0']},
+    {label:'B bits',values:[0,0,1,1],type:'bitset',indices:['bit 3','bit 2','bit 1','bit 0']}
+  );
+  bitset[1].rows[0].type = 'state';
+  delete bitset[1].rows[0].indices;
+  bitset[1].hiddenRows = ['XOR'];
+  bitset[1].rows.push({label:'XOR bits',values:[0,1,1,0],type:'bitset',indices:['bit 3','bit 2','bit 1','bit 0']});
+  for (const s of window.EXAMPLE_VISUALS['bitset-cost'].steps.slice(2)) {
+    s.rows.find(r=>r.label==='A bits · 왼쪽부터 3,2,1,0').indices=['bit 3','bit 2','bit 1','bit 0'];
+    s.rows.find(r=>r.label==='B bits · 왼쪽부터 3,2,1,0').indices=['bit 3','bit 2','bit 1','bit 0'];
+  }
+
+  const lcaQueries = window.EXAMPLE_VISUALS.lca.steps;
+  for (const n of lcaQueries[1].graph.nodes) if (['4','5'].includes(String(n.id))) n.active = true;
+  for (const n of lcaQueries[2].graph.nodes) if (['4','3'].includes(String(n.id))) n.active = true;
+  lcaQueries[3].graph.edges.push(
+    {from:8,to:6,label:'2칸 조상',directed:true,dependency:true},
+    {from:8,to:4,label:'4칸 조상',directed:true,dependency:true}
+  );
+
+  window.VisualPrimitives.enrichAdvanced(window.EXAMPLE_VISUALS);
+}
+
+// Final semantic review: ordered states are not automatically indexed arrays.
+{
+ const v=window.EXAMPLE_VISUALS;
+ const sequenceRows={
+  'graph-model':['adj[1]','adj[2]'],
+  'shortest-variants':['사이클 비용','1의 비용 반복'],
+  'sqrt-decomposition':['읽은 요약','질의 후보'],
+  'mst':['누적 비용'],'sweep-line':['시각 4 처리'],
+  'modular-math':['누적'],'cpp-essentials':['입력 버퍼','읽기 결과'],
+  'tree-traversal':['전위','중위','후위','레벨'],
+  'lca':['정점 8의 점프 길이','4칸 점프의 의존','점프 경로','깊이','사용 점프 길이'],
+  'state-model':['ID','저장 위치','삭제 뒤 ID'],
+  'candidate-filter':['후보','최종 결과'],
+  'path-algebra':['경로 A','경로 B','각 경로 품질'],
+  'path-sensitivity':['증거 경로 비용','다른 경로 비용'],
+  'ordered-index':['정렬 키','새 정렬 키','삭제 직후','재삽입 후'],
+  'lazy-validity':['세대','현재 세대','저장 그룹 세대','현재 그룹 세대']
+ };
+ for(const [id,labels] of Object.entries(sequenceRows))for(const s of v[id].steps)for(const r of s.rows||[])if(labels.includes(r.label)){r.type='sequence';delete r.indices;}
+ const labels={
+  'shortest-variants':{'시작 거리':['정점 0','정점 1','정점 2'],'0→1 뒤':['정점 0','정점 1','정점 2'],'0→2 뒤':['정점 0','정점 1','정점 2'],'1→2 뒤':['정점 0','정점 1','정점 2']},
+  'sqrt-decomposition':{'블록 최대':['[0,4)','[4,8)','[8,10)'],'새 블록 최대':['[0,4)','[4,8)','[8,10)']},
+  'candidate-filter':{'활성':['ID 0','ID 1','ID 2']},
+  'resource-state':{'비용':['상태 A','상태 B'],'자원':['상태 A','상태 B']},
+  'lca':{'up[k][8]':['k=0 · 1칸','k=1 · 2칸','k=2 · 4칸','k=3 · 8칸']}
+ };
+ for(const [id,rs] of Object.entries(labels))for(const s of v[id].steps)for(const r of s.rows||[])if(rs[r.label])r.indices=rs[r.label];
+ for(const s of v['path-algebra'].steps)if(s.rows.some(r=>r.label==='경로 A'))s.hiddenRows=['경로 A','경로 B'];
+ for(const s of v['path-sensitivity'].steps)if(s.rows.some(r=>r.label==='증거 경로 비용'))s.hiddenRows=['증거 경로 비용','다른 경로 비용'];
+ for(const s of v['monotonic-stack'].steps)for(const r of s.rows)if(r.label==='결과에 기록')r.type='sequence';
+ const pop=v['monotonic-stack'].steps[1];
+ pop.rows.find(r=>r.label==='pop 순서').values=[0,2]; // Before pop, top must be index 2.
+ pop.rows.find(r=>r.label==='pop 순서').label='pop 전 스택 · top은 index 2';
+ pop.rows.find(r=>r.type==='stack').indices=['index 0','index 2'];
+ pop.flow.items=['top index 2 → ans[2]=4','다음 top index 0 → ans[0]=4','비어 있음 → push index 3'];
+ pop.rows.push({label:'입력',values:[2,1,2,4,3],type:'array',active:[3]},{label:'pop 후 스택',values:[3],type:'stack'});
+ const monoFinal=v['monotonic-stack'].steps.at(-1);monoFinal.rows.push({label:'종료 후 스택',values:[],type:'stack'});monoFinal.flow={label:'입력 종료 → 미해결 답 처리',items:['stack index 3,4','뒤에 더 큰 값 없음','ans[3]=ans[4]=−1']};
+ const fenwick=v['fenwick-tree'].steps[0];
+ fenwick.graph.nodes=[{id:4,label:4,caption:'[1,4] · 10 → 15',active:true,x:350,y:45},{id:2,label:2,caption:'[1,2] · 3',x:170,y:140},{id:3,label:3,caption:'[3,3] · 4 → 9',active:true,x:500,y:140},{id:1,label:1,caption:'[1,1] · 2',x:80,y:235}];
+ fenwick.graph.edges=[{from:1,to:2,directed:true},{from:2,to:4,directed:true},{from:3,to:4,active:true,directed:true}];
+ fenwick.flow={label:'i += i & −i · A[2]에 +5',items:['0-based A[2] → BIT index 3','3 + lowbit(3)=4','4 + lowbit(4)=8 · 종료']};
+ v['fenwick-tree'].steps[1].flow={label:'i -= i & −i · prefix 차이',items:['prefix(4): bit[4]=15 → index 0','prefix(1): bit[1]=2 → index 0','15 − 2 = 13']};
+ for(const [i,s] of v['segment-tree'].steps.entries()){
+  const values=i?[13,3,10,2,1,7,3]:[10,3,7,2,1,4,3];
+  s.graph.nodes.forEach((n,j)=>{n.label=values[j];n.caption=['[0,4)','[0,2)','[2,4)','[0,1)','[1,2)','[2,3)','[3,4)'][j];});
+  s.graph.edges.find(e=>e.from===1&&e.to===2).active=false;
+  s.rows.push({label:'원본 A',values:i?[2,1,7,3]:[2,1,4,3],type:'array',active:i?[2]:[]});
+ }
+ const lis=v.lis.steps;
+ lis.splice(1,0,{title:'20은 기존 길이 2의 꼬리를 대체',note:'첫 20 이상인 자리 tails[1]을 20으로 대체합니다. 새 길이를 추가하지 않으며 tails는 길이별 최소 꼬리 후보이지 복원한 답 수열이 아닙니다.',renderer:'dependency',rows:[{label:'입력',values:[10,20,10,30,20,50],type:'array',active:[4]},{label:'tails · 길이별 최소 꼬리',values:[10,20,30],type:'array',indices:['길이 1','길이 2','길이 3'],active:[1]}],flow:{label:'lower_bound → replace',items:['현재 입력 20','첫 tails ≥ 20: index 1','20 → 20 · 길이는 3 유지']}});
+ lis.at(-1).rows.unshift({label:'입력',values:[10,20,10,30,20,50],type:'array',active:[5]});lis.at(-1).title='50은 새 길이 4를 추가';lis.at(-1).note='모든 tails 값이 50보다 작으므로 뒤에 새 꼬리를 추가합니다. tails만으로 일반적인 답 수열을 복원할 수는 없고 이전 위치 링크가 별도로 필요합니다.';lis.at(-1).flow={label:'lower_bound → append',items:['현재 입력 50','모든 꼬리보다 큼','길이 4의 꼬리 50 추가']};
+ const lca=v.lca.steps;
+ for(const s of lca.slice(3)){
+  s.graph.nodes.forEach(n=>{n.y=145;n.caption=n.id===8?'U · d7':n.id===3?'V · d2':'d'+(n.id-1);});
+  // Power-of-two jumps arc over the parent chain, instead of crossing its nodes.
+  s.graph.edges=s.graph.edges.filter((e,i,es)=>es.findIndex(t=>t.from===e.from&&t.to===e.to&&t.label===e.label)===i);
+  for(const e of s.graph.edges)if(e.label)e.bend=e.to===6?70:-100;
+ }
+ lca[4].graph.nodes.forEach(n=>{n.active=n.id===8;n.selected=n.id===3;n.dependency=n.id===4;});
+ for(const e of lca[1].graph.edges)if(['4','5'].includes(String(e.to))){e.active=true;e.directed=true;}
+ for(const e of lca[2].graph.edges)if(['2','3','4'].includes(String(e.to))){e.active=true;e.directed=true;}
+ lca[1].flow={label:'같은 깊이의 두 query',items:['query U=4 / V=5','같은 깊이 → 각 부모 2','공통 부모 2 반환']};
+ lca[2].flow={label:'깊이 맞추기 → 공통 부모',items:['U=4(depth2) → 2(depth1)','V=3(depth1)','서로 다른 2,3의 부모는 1']};
+ for(const [i,s] of v['dp-patterns'].steps.entries()){
+  const capacity=s.rows?.filter(r=>['capacity','용량','금액'].includes(r.label)).map(r=>r.label);if(capacity?.length)s.hiddenRows=capacity;
+  if(i===0)s.flow={label:'0/1 물건 1 · 역순으로 이전 상태 참조',items:['이전 dp[0]=0','무게2 · 가치4','dp[2]=4 · 같은 물건 재사용 금지']};
+  if(i===1){s.rows[0].dependency=[1];s.rows[0].active=[4];s.flow={label:'물건 2 → 용량 4',items:['dp[1]=0','+ 가치5 → 후보5','기존4','max(4,5) → 5']};}
+  if(i===2)s.flow={label:'오름차순의 잘못된 dependency',items:['방금 만든 dp[2]=4','같은 물건 가치4 다시 사용','dp[4]=8 · 0/1 조건 위반']};
+  if(i===3)s.flow={label:'루프 순서 → 세는 대상',items:['동전 바깥: {1,1,1}, {1,2}','금액 바깥: (1,1,1), (1,2), (2,1)']};
+  if(i===4)s.flow={label:'mask와 마지막 정점을 함께 보존',items:['(001,0) 비용0','0→1 +2 · (011,1)','1→2 +3 · (111,2)','2→0 +4 · 총9']};
+ }
+ v['modular-math'].steps[1].flow={label:'켜진 지수 bit만 누적 곱',items:['bit0: 1×3 mod7=3','bit2: 3×4 mod7=5','bit3: 5×2 mod7=3']};
+ v['cpp-essentials'].steps[0].rows[0].pointers={1:'cursor · 남은 개행'};
+ v['grid-search'].steps.forEach(s=>{s.renderer='traversal';s.flow={label:'grid BFS · 첫 발견 거리',items:['S 거리0','오른쪽 T 첫 발견','dist[T] = dist[S]+1 = 1']};});
+}
+{
+ const v=window.EXAMPLE_VISUALS;
+ for(const s of v.lca.steps.slice(3))for(const e of s.graph.edges)if(!e.label){e.selected=false;e.active=false;}
+ const sweep=v['sweep-line'].steps[1];sweep.intervals[0].discarded=true;sweep.intervals[2].active=true;
+ v['bitmask-subsets'].steps[0].hiddenRows=['작업 번호'];
+ for(const s of v['bitset-cost'].steps){
+  s.flow={label:'같은 bit 위치끼리 연산',items:s.title.includes('OR')?['A OR B → 어느 쪽에든 ON','A AND B → 양쪽 모두 ON','OR의 ON 개수 = 3']:s.title.includes('적용')?['0101 XOR 0011 = 0110','ON bit 2,1','차이 2개']:['0101: bit2,0 ON','0011: bit1,0 ON','bit0은 공통']};
+ }
+}

@@ -161,6 +161,7 @@ function trace(kind, input) {
      if(c>x){s.note='금액 '+x+'보다 동전 '+c+'이 커서 사용할 수 없습니다.';s.line=6;push(s);continue;}
      if(s.dp[x-c]===null){s.note='금액 '+(x-c)+'를 만들 수 없어 동전 '+c+' 후보를 제외합니다.';s.line=6;push(s);continue;}
      const candidate=s.dp[x-c]+1,old=s.dp[x];
+     s.candidate=candidate;s.old=old;
      s.dp[x]=old===null?candidate:Math.min(old,candidate);
      s.note='dp['+(x-c)+']+1 = '+candidate+'. dp['+x+'] '+(old===null?'∞':old)+' → '+s.dp[x]+'. 마지막 동전 '+c+'을(를) 비교합니다.';s.line=7;push(s);
     }

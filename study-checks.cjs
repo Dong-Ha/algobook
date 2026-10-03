@@ -1,5 +1,10 @@
 // Compile the displayed study snippets, then compare key designs to slow independent oracles.
 const fs=require('node:fs'),cp=require('node:child_process'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict');
+// Also support the documented standalone command, not only checks.cjs imports.
+if(!global.window?.CHAPTERS){
+ global.window={};
+ for(const file of ['content','advanced','cases','service-cases'])require('./docs/'+file+'.js');
+}
 const cs=window.CHAPTERS, get=id=>cs.find(c=>c.id===id).code;
 const snippets={
  'stl-performance':()=>{const s=get('stl-performance').split('// Dijkstra')[0];return s+'\nvoid test(){assert(kthLargest({8,2,9,1,7},2)==8);assert(kthLargest({4,9,9,1},2)==9);assert(kthLargest({-3},1)==-3);}';},

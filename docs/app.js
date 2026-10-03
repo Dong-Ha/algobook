@@ -145,36 +145,8 @@ function cells(values,active=[],discard=[],prefix='a',extraClass=()=>'',labels={
 }
 function stat(label,value){return '<div class="stat"><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong></div>';}
 function tokens(label,values){return '<div class="state-block"><span>'+esc(label)+'</span><div class="tokens">'+(values.length?values.map(v=>'<b>'+esc(typeof v==='object'?'('+v.i+','+v.sum+')':v)+'</b>').join(''):'<small>비어 있음</small>')+'</div></div>';}
-function graphSVG(s){
- const coords={};for(let i=1;i<=s.n;i++){const t=-Math.PI/2+2*Math.PI*(i-1)/s.n;coords[i]=[270+185*Math.cos(t),195+150*Math.sin(t)];}
- const edgekey=e=>[...e].sort((a,b)=>a-b).join('-');
- let svg='<svg viewBox="0 0 540 390" role="img" aria-label="'+(s.kind==='dfs'?'DFS':'BFS')+' 그래프. 현재 정점 '+(s.current??'없음')+'">';
- for(const e of s.edges){
-  const [x1,y1]=coords[e[0]],[x2,y2]=coords[e[1]],on=s.edge&&edgekey(e)===edgekey(s.edge),tree=s.tree.some(t=>edgekey(t)===edgekey(e));
-  if(e[0]===e[1])svg+='<circle cx="'+x1+'" cy="'+(y1-28)+'" r="24" fill="none" stroke="'+(on?'#c65d22':'#c1cbd4')+'" stroke-width="2"/>';
-  else svg+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(on?'#c65d22':tree?'#0f766e':'#c7d1db')+'" stroke-width="'+(on?4:tree?3:1.5)+'"/>';
- }
- for(let v=1;v<=s.n;v++){
-  const [x,y]=coords[v],current=s.current===v,infront=s.stack.includes(v)||s.queue.includes(v),done=s.done.includes(v);
-  const fill=current?'#c65d22':infront?'#112235':done?'#0f766e':'#fff';
-  svg+='<g><circle cx="'+x+'" cy="'+y+'" r="24" fill="'+fill+'" stroke="'+(s.visited.includes(v)?fill:'#aab9c6')+'" stroke-width="2"/><text x="'+x+'" y="'+(y+6)+'" fill="'+(s.visited.includes(v)?'#fff':'#36485b')+'" text-anchor="middle" font-size="18" font-weight="600">'+v+'</text>';
-  if(s.kind==='bfs')svg+='<text x="'+x+'" y="'+(y+43)+'" text-anchor="middle" fill="#596b7a" font-size="13">d='+ (s.dist[v]===null?'∞':s.dist[v])+'</text>';
-  svg+='</g>';
- }
- return svg+'</svg>';
-}
-function trieSVG(s){
- const children=s.nodes.map(()=>[]);
- s.nodes.forEach(n=>{if(n.parent!==null)children[n.parent].push(n.id);});
- children.forEach(a=>a.sort((x,y)=>s.nodes[x].ch.localeCompare(s.nodes[y].ch)));
- const pos={},leaf={count:0};
- function layout(id,depth){const cs=children[id];let x;if(!cs.length)x=55+leaf.count++*88;else{cs.forEach(c=>layout(c,depth+1));x=(pos[cs[0]][0]+pos[cs[cs.length-1]][0])/2;}pos[id]=[x,40+depth*78];}
- layout(0,0);const w=Math.max(240,leaf.count*88+22),h=80+Math.max(...s.nodes.map(n=>n.prefix.length))*78;
- let svg='<svg viewBox="0 0 '+w+' '+h+'" style="min-width:'+Math.min(w,760)+'px;min-height:'+Math.min(h,520)+'px" role="img" aria-label="Trie，当前接두사 '+esc(s.nodes[s.current]?.prefix||'루트')+'">';
- s.nodes.forEach(n=>{if(n.parent!==null){const [x,y]=pos[n.id],[px,py]=pos[n.parent],on=s.path.includes(n.id);svg+='<line x1="'+px+'" y1="'+py+'" x2="'+x+'" y2="'+y+'" stroke="'+(on?'#0f766e':'#c2cdd7')+'" stroke-width="'+(on?3:1.5)+'"/><text x="'+((x+px)/2+10)+'" y="'+((y+py)/2)+'" fill="#596b7a" font-size="13">'+n.ch+'</text>';}});
- s.nodes.forEach(n=>{const [x,y]=pos[n.id],cur=n.id===s.current,on=s.path.includes(n.id),fill=cur?'#c65d22':on?'#0f766e':'#fff';svg+='<g><circle cx="'+x+'" cy="'+y+'" r="22" fill="'+fill+'" stroke="'+(cur||on?fill:'#aab9c6')+'" stroke-width="2"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-size="'+(n.id===0?11:16)+'" fill="'+(cur||on?'#fff':'#112235')+'">'+(n.id===0?'root':n.ch)+'</text>'+(n.end?'<text x="'+(x+19)+'" y="'+(y-18)+'" font-size="18" fill="#0f766e">★</text>':'')+'</g>';});
- return '<div class="trie-scroll">'+svg+'</svg></div>';
-}
+function graphSVG(s){return window.VisualPrimitives.graph(window.VisualPrimitives.traversalGraph(s),s.kind.toUpperCase()+' · 현재 정점 '+(s.current??'없음'));}
+function trieSVG(s){return window.VisualPrimitives.graph(window.VisualPrimitives.trieGraph(s),'Trie · 현재 접두사 '+(s.nodes[s.current]?.prefix||'루트'));}
 function draw(){
  if(!lab||!$('#scene'))return;
  const s=lab.frames[lab.index];let html='',stats='';
@@ -189,7 +161,7 @@ function draw(){
   const labels={};
   if(s.kind==='twopointer'){labels[s.l]='L';labels[s.r]=labels[s.r]?'L · R':'R';}
   if(s.kind==='binary'){labels[s.l]='L';if(s.r<s.a.length)labels[s.r]='R · 제외';if(s.m!==undefined)labels[s.m]=(labels[s.m]?labels[s.m]+' · ':'')+'MID';}
-  html='<div class="array-stage"><p class="scene-label">'+(s.kind==='dp'?'동전 종류':s.kind==='binary'||s.kind==='twopointer'?'정렬한 배열':'입력 배열')+'</p>'+cells(s.a,s.active,s.discard,'a',i=>s.chosen?.includes(i)?'chosen':s.kind==='sort'&&i<s.sorted?'sorted':'',labels);
+  html='<div class="array-stage">'+(['binary','twopointer'].includes(s.kind)?window.VisualPrimitives.sequence(window.VisualPrimitives.fromTrace(s,lab.index).rows[0]):'<p class="scene-label">'+(s.kind==='dp'?'동전 종류':'입력 배열')+'</p>'+cells(s.a,s.active,s.discard,'a',i=>s.chosen?.includes(i)?'chosen':s.kind==='sort'&&i<s.sorted?'sorted':'',labels));
   if(s.kind==='prefix'){html+='<p class="scene-label">누적합 p · p[i] = 앞의 i개 원소의 합</p>'+cells(s.p,s.result!==undefined?[s.l,s.r]:s.active.map(i=>i+1),[],'p');stats=stat('질의 구간','['+s.l+', '+s.r+')')+stat('구간 합',s.result??'계산 중');}
   if(s.kind==='twopointer')stats=stat('목표 K',s.target)+stat('현재 합',s.sum??'—')+stat('왼쪽 / 오른쪽',(s.l??0)+' / '+(s.r??0))+(s.result!==undefined?stat('결과',s.result===false?'쌍 없음':s.result.join(' + ')):'');
   if(s.kind==='binary')stats=stat('목표 K',s.target)+stat('미확정 구간','['+s.l+', '+s.r+')')+stat('mid',s.m??'—')+(s.result!==undefined?stat('반환 인덱스',s.result):'');
@@ -197,8 +169,9 @@ function draw(){
    stats=stat('정렬된 앞부분',s.sorted+'개')+'<p class="state-tip">이 실험은 삽입 정렬입니다. 왼쪽 정렬 구간에 원소 하나씩 넣습니다.</p>';
    if(lab.index===lab.frames.length-1){const groups=[];s.a.forEach(v=>{const prev=groups.at(-1);if(prev&&prev[0]===v)prev[1]++;else groups.push([v,1]);});html+='<p class="scene-label">정렬 후 같은 값 묶기 · (값, 빈도)</p>'+tokens('출력',groups.map(g=>'('+g.join(', ')+')'));}
   }
-  if(s.kind==='dp'){html+='<p class="scene-label">dp[x] · 금액 x를 만드는 최소 동전 개수</p>'+cells(s.dp,[s.x,s.from].filter(x=>x>=0),[],'dp',i=>i<s.x?'sorted':'');stats=stat('목표 금액',s.target)+stat('현재 금액 x',s.x)+stat('마지막 동전 후보',s.coin??'—')+(s.result!==undefined?stat('최소 개수',s.result===-1?'불가능':s.result):'');}
+  if(s.kind==='dp'){html+=window.VisualPrimitives.sequence(window.VisualPrimitives.fromTrace(s,lab.index).rows[1]);stats=stat('목표 금액',s.target)+stat('현재 금액 x',s.x)+stat('마지막 동전 후보',s.coin??'—')+(s.result!==undefined?stat('최소 개수',s.result===-1?'불가능':s.result):'');}
   if(s.kind==='backtrack'){html+='<div class="branch-strip"><span>선택하지 않기</span><span>↔</span><span>선택하기</span></div><p class="scene-label">발견한 부분집합</p><div class="solutions">'+(s.answers.length?s.answers.map(x=>'<span>{ '+esc(x.join(', '))+' }</span>').join(''):'아직 없습니다.')+'</div>';stats=stat('목표 합',s.target)+stat('현재 합',s.sum)+tokens('호출 스택 (i, sum)',s.stack)+tokens('고른 원소',s.chosen.map(i=>s.a[i]));}
+  if(['dp','binary','twopointer','prefix'].includes(s.kind)){const semantic=window.VisualPrimitives.fromTrace(s,lab.index);html+=window.VisualPrimitives.flow(semantic.flow);}
   html+='</div>';
  }
  $('#scene').innerHTML=html;$('#state-panel').innerHTML=stats;

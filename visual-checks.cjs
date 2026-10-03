@@ -57,3 +57,73 @@ for(const [s,label]of [[kth,'빈도'],[deleted,'갱신 빈도']]){let sum=0;cons
 const sortedAfter=[2,4,7];assert.deepEqual(vals(deleted,'rank(4) · select(3)'),[sortedAfter.filter(x=>x<4).length,sortedAfter[2]]);
 assert(window.MIXED.every(q=>!window.CHAPTERS.some(c=>c.quiz.q===q.q)),'Mixed practice must use independent questions');
 console.log(JSON.stringify({chapters:window.CHAPTERS.length,visualSteps:count,engineExamples:11,conceptDiagrams:conceptIds.length,lcsTable:'passed',status:'passed'}));
+
+// The diagram contract carries meaning; state values must never gain fake indices.
+const families=new Set(['sequence','mapping','graph','tree','timeline','dependency','bitset','frontier','range-search','pointers','state-space','traversal','trie']);
+const roles=new Set(['array','state','sequence','stack','queue','bitset']);
+for(const [id,v] of Object.entries(visuals))for(const s of v.steps){
+ assert(families.has(s.renderer),id+' requires an explicit semantic renderer');
+ for(const r of s.rows||[]){
+  assert(roles.has(r.type),id+' '+r.label+' requires an explicit role');
+  if(r.indices)assert.equal(r.indices.length,r.values.length,id+' index label count');
+  for(const key of ['dependency','discarded','candidate','pending'])for(const i of r[key]||[])assert(Number.isInteger(i)&&i>=0&&i<r.values.length,id+' '+key);
+  if(r.pointers)for(const i of Object.keys(r.pointers))assert(+i>=0&&+i<=r.values.length,id+' pointer boundary');
+  const html=window.VisualPrimitives.sequence(r);
+  if(!['array','bitset'].includes(r.type))assert(!html.includes('<small>'),id+' non-indexed state');
+ }
+ if(s.flow)assert(s.flow.label&&s.flow.items.length&&s.flow.items.every(x=>typeof x==='string'),id+' transition');
+ if(s.hiddenRows)for(const label of s.hiddenRows)assert(s.rows.some(r=>r.label===label),id+' hidden source row');
+ if(s.graph){const w=s.graph.width||600,h=s.graph.height||300;for(const n of s.graph.nodes)assert(n.x>=25&&n.x<=w-25&&n.y>=25&&n.y<=h-25,id+' graph bounds');}
+ const legend=window.ExampleVisuals.legend(s),indexed=(s.rows||[]).filter(r=>!s.hiddenRows?.includes(r.label)).some(r=>r.type==='array'&&!r.indices);
+ assert.equal(legend.includes('0-based'),indexed,id+' conditional index legend');
+}
+const raw=(id)=>window.AlgoEngine.trace(id,window.EXAMPLE_INPUTS[id]);
+// Verify spatial search decisions against independent comparisons, before Next.
+for(const [i,s] of raw('binary').entries()){
+ const r=visuals.binary.steps[i].rows[0];
+ assert.deepEqual(r.candidate,s.a.map((_,j)=>j).filter(j=>j>=s.l&&j<s.r));
+ if(s.line===4){const next=raw('binary')[i+1];assert.deepEqual(r.pending,s.a.map((_,j)=>j).filter(j=>j>=s.l&&j<s.r&&(j<next.l||j>=next.r)));}
+}
+for(const [i,s] of raw('twopointer').entries()){
+ const r=visuals.twopointer.steps[i].rows[0];assert(r.pointers[s.l].includes('L'));assert(r.pointers[s.r].includes('R'));
+ assert.deepEqual(r.discarded,s.discard);
+}
+for(const [i,s] of raw('dp').entries())if(s.line===7){
+ assert.equal(s.candidate,s.dp[s.from]+1);assert.equal(s.dp[s.x],Math.min(s.old??Infinity,s.candidate));
+ const scene=visuals.dp.steps[i];assert.deepEqual(scene.rows[1].dependency,[s.from]);assert(scene.flow.items.includes('기존 '+(s.old??'∞')));
+}
+for(const id of ['dfs','bfs'])for(const [i,s] of raw(id).entries()){
+ const g=visuals[id].steps[i].graph;
+ assert.deepEqual(g.nodes.filter(n=>n.frontier).map(n=>n.id).sort(),[...s.stack,...s.queue].sort());
+ assert.deepEqual(g.nodes.filter(n=>n.selected).map(n=>n.id).sort(),[...s.done].sort());
+ assert.equal(g.edges.filter(e=>e.active).length,s.edge?1:0);
+ assert.equal(g.edges.filter(e=>e.selected).length,s.tree.length);
+}
+const treeSteps=visuals['segment-tree'].steps;
+for(const s of treeSteps){assert(s.graph?.nodes.length>=7,'segment tree must show parent-child relationships');assert(s.graph.edges.length>=6);}
+assert(visuals['fenwick-tree'].steps.every(s=>s.flow?.items.some(x=>/3|4/.test(x))),'Fenwick must expose index paths');
+assert(visuals.backtrack.steps.every(s=>s.graph?.nodes.length===15),'subset state-space tree');
+assert(visuals.dsu.steps.every(s=>s.graph),'DSU forest');
+assert(visuals.lca.steps.filter(s=>s.title.includes('깊이 차')).every(s=>s.graph&&s.flow),'LCA jumps must be spatial');
+assert(visuals['monotonic-stack'].steps.some(s=>s.rows.some(r=>r.type==='stack')),'LIFO state must be distinguished');
+assert(visuals['bitmask-subsets'].steps.some(s=>s.rows.some(r=>r.type==='bitset')),'bit positions must be explicit');
+assert.throws(()=>window.ExampleVisuals.render({renderer:'unknown'}),/Unknown visual renderer/);
+const escaped=window.VisualPrimitives.sequence({type:'state',label:'<script>',values:['<img onerror="x">']});assert(!escaped.includes('<script>')&&!escaped.includes('<img'));
+console.log(JSON.stringify({semanticSchema:'passed',prediction:'passed',dependencies:'passed',sharedPrimitives:'passed'}));
+
+// Check the actual drawn topology and update path, not only retained source rows.
+for(const [i,s] of visuals['segment-tree'].steps.entries()){
+ const nodes=new Map(s.graph.nodes.map(n=>[n.id,n.label]));
+ for(const parent of [1,2,3]){const children=s.graph.edges.filter(e=>e.from===parent).map(e=>e.to);assert.equal(nodes.get(parent),children.reduce((sum,id)=>sum+nodes.get(id),0));}
+ if(i===1){assert.deepEqual(s.graph.nodes.filter(n=>n.active).map(n=>n.id).sort(),[1,3,6]);assert.deepEqual(s.graph.edges.filter(e=>e.active).map(e=>[e.from,e.to]).sort(),[[1,3],[3,6]]);}
+}
+const bitGraph=visuals['fenwick-tree'].steps[0].graph;
+for(const e of bitGraph.edges)assert.equal(e.to,e.from+(e.from&-e.from));
+assert.deepEqual(bitGraph.edges.filter(e=>e.active).map(e=>[e.from,e.to]),[[3,4]]);
+const jumpScene=visuals.lca.steps.find(s=>s.title.includes('깊이 차'));
+const jumps=jumpScene.graph.edges.filter(e=>e.label?.includes('점프'));
+assert.deepEqual(jumps.map(e=>[e.from,e.to]),[[8,4],[4,3]]);assert(jumps.every(e=>e.directed&&e.bend),'lifting jumps must arc over the parent chain');
+for(const s of visuals['bitset-cost'].steps)for(const r of s.rows.filter(r=>r.type==='bitset'))assert(r.values.every(x=>x===0||x===1),'a whole bit string must not masquerade as one bit');
+const monoPop=visuals['monotonic-stack'].steps.find(s=>s.title.includes('pop'));
+assert.deepEqual(monoPop.rows.find(r=>r.label.includes('pop 전')).values,[0,2]);assert.deepEqual(monoPop.rows.find(r=>r.label==='pop 후 스택').values,[3]);
+console.log(JSON.stringify({treeSums:'passed',ancestorUpdatePath:'passed',lowbitEdges:'passed',liftingJumps:'passed',bitPositions:'passed',stackTransitions:'passed'}));

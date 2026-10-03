@@ -53,3 +53,28 @@
 @media(max-width:700px){.concept-guide{grid-template-columns:1fr;padding:20px}}
 
 .exercise-answer{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}.exercise-answer summary{cursor:pointer;font-weight:600;color:var(--teal)}.exercise-answer summary:focus-visible{outline:3px solid var(--teal);outline-offset:4px}.exercise-answer p{font-size:14px;line-height:1.9}
+
+/* Shared semantic language: current / selected / frontier / dependency / excluded. */
+.viz-view{display:grid;gap:22px}.viz-view .viz-row+.viz-row{margin-top:0}
+.viz-token{display:flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #b9c9d3;border-radius:6px;background:#f8fafb;overflow-wrap:anywhere;font:14px monospace}
+.viz-state .viz-token{border:0;border-left:3px solid #b9c9d3;border-radius:0;background:#f3f7f8}
+.viz-frontier,.example-graph .viz-frontier circle{background:#112235;fill:#112235;border-color:#112235;stroke:#112235;color:#fff}
+.example-graph .viz-frontier text{fill:#fff}.example-graph .viz-caption{font-size:12px;fill:#526777!important}
+.viz-dependency,.example-graph .viz-dependency circle{border:2px dashed #526777;stroke:#526777;stroke-dasharray:5 3;background:#f0f4f6;fill:#f0f4f6}
+.viz-discarded,.example-graph .viz-discarded circle{background:#edf1f3;fill:#edf1f3;border-color:#ccd5dc;stroke:#ccd5dc;color:#526777}
+.viz-discarded b{text-decoration:line-through}.viz-candidate{box-shadow:0 3px 0 #9aabba}
+.viz-pending{background-image:repeating-linear-gradient(135deg,transparent,transparent 6px,#c65d2218 6px,#c65d2218 10px);border-bottom:3px dashed #c65d22}
+.viz-array .viz-cells,.viz-bitset .viz-cells{flex-wrap:nowrap;align-items:stretch;overflow-x:auto;padding:4px 2px 10px}.viz-array .viz-cell,.viz-bitset .viz-cell{flex:none;position:relative}
+.viz-pointer{font:700 11px monospace;min-height:20px;color:#853709;white-space:nowrap}.viz-boundary{display:flex;flex-direction:column;justify-content:center;padding:10px;border-left:2px dashed #526777;font:12px monospace;min-width:80px}.viz-boundary small{margin-top:8px}
+.viz-bit-status{font-size:10px;margin-top:5px}.viz-endpoints{font:12px monospace;color:#526777;margin:0 0 8px}
+.viz-stack .viz-cells{display:flex;flex-direction:column-reverse;align-items:flex-start;border-left:3px solid #112235;padding-left:12px;gap:4px}.viz-queue .viz-cells{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}.viz-queue .viz-token{flex-shrink:0}
+.viz-flow{padding:14px 16px;background:#f3f7f8;border:1px solid #d7e0e6;border-radius:7px;margin-top:12px}.viz-flow ol{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}.viz-flow li{font:13px monospace;line-height:1.8}.viz-flow-arrow{color:#c65d22;font-weight:bold}
+.viz-graph-scroll{overflow-x:auto}.example-graph .viz-edge{stroke:#9aabba;fill:none;stroke-width:2}.example-graph .viz-edge text{stroke:none;fill:#526777;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+.example-graph .viz-edge.viz-selected{stroke:#0f766e;stroke-width:4}.example-graph .viz-edge.viz-active{stroke:#c65d22;stroke-width:4}.example-graph .viz-edge.viz-dependency{stroke:#526777;stroke-dasharray:6 4;stroke-width:3}.example-graph .viz-edge.viz-discarded{stroke:#ccd5dc;stroke-dasharray:4 4}.example-graph .viz-loop{fill:none}
+.viz-time-axis{display:grid;grid-template-columns:110px 1fr;gap:12px;padding-bottom:12px;font:12px monospace}.viz-time-axis>div{position:relative;margin:0 10px;height:18px}.viz-time-axis small{position:absolute;transform:translateX(-50%)}
+.viz-track{position:relative}.viz-track .viz-active{background:#fff0e5;border:1px solid #c65d22;color:#853709}.viz-track .viz-discarded{background:#edf1f3;color:#526777;border-bottom:1px dashed #9aabba}.viz-cursor{position:absolute;top:-7px;bottom:-7px;border-left:2px dashed #c65d22}.viz-grid th{font:12px monospace;color:#526777;padding:6px}.viz-grid .viz-dependency{border-style:dashed}
+@media(max-width:600px){.viz-time-axis{grid-template-columns:80px 1fr}.viz-view{gap:16px}.viz-flow{padding:12px}.viz-pointer{font-size:10px}.example-scene .viz-cell{min-width:42px}.viz-state .viz-cells{align-items:stretch}.viz-flow-arrow{padding:0 3px}}
+.example-graph .viz-node text{stroke:none}.example-graph{max-height:420px}
+.viz-graph-scroll:focus-visible{outline:3px solid #0f766e;outline-offset:3px}
+@media(max-width:600px){.viz-graph-scroll::before{content:'↔ 좌우로 이동하여 전체 구조 보기';display:block;position:sticky;left:0;font-size:11px;color:#526777;margin-bottom:10px}.viz-array .viz-cells::after,.viz-bitset .viz-cells::after{content:'';flex:none;width:4px}}
+.viz-state .viz-token.viz-active{background:#fff0e5;border-left-color:#c65d22}.viz-state .viz-token.viz-selected{background:#e2f4ef;border-left-color:#0f766e}.viz-state .viz-token.viz-discarded{background:#edf1f3;border-left-color:#ccd5dc}
