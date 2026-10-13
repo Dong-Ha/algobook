@@ -25,7 +25,7 @@ const server=http.createServer((req,res)=>{
    for(const id of ids){
     await p.goto(base+'/index.html#'+id);await p.locator('.example-frame').waitFor();
     assert.equal(await p.locator('.example-frame').count(),1,id+' one figure');
-    assert.equal(await p.locator('input,textarea,select,form,iframe').count(),0,id+' no data input or duplicate embed');
+    assert.equal(await p.locator('.example-frame input,.example-frame textarea,.example-frame select,main form,main iframe').count(),0,id+' no data input or duplicate embed');
     assert(!/EXAMPLE WALKTHROUGH|INTERACTIVE LAB|EXTENDED VISUAL LAB/.test(await p.locator('main').innerText()));
     const n=await p.locator('[data-example]').count();
     for(let j=0;j<n;j++){

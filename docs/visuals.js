@@ -279,34 +279,59 @@ function enrichAdvanced(v){
 }
 window.VisualPrimitives={graph,sequence,flow,traversalGraph,trieGraph,fromTrace,enrichAdvanced};
 window.ExampleVisuals={render,legend,mount(id,root){
- const examples=window.WorkedExamples?.catalogue[id]||[visuals[id]];
- if(!examples[0])return;
- const requested=new URLSearchParams(location.search).get('example');
- let selected=Math.max(0,examples.findIndex(v=>v.key===requested)),index=0;
+ const examples=window.WorkedExamples?.catalogue[id]||[visuals[id]];if(!examples[0])return;
+ const params=new URLSearchParams(location.search),requested=params.get('example');
+ let selected=Math.max(0,examples.findIndex(v=>v.key===requested));
+ const step=Number(params.get('step'));
+ let index=Number.isSafeInteger(step)&&step>=1?Math.min(step-1,examples[selected].steps.length-1):0;
+ let detailKey=null;
  root.setAttribute('aria-label','예제 따라가기');
- root.innerHTML='<div class="worked-heading"><p class="eyebrow">예제 따라가기</p><p>다음 단계에서 바뀔 값을 먼저 예상해 보세요.</p></div><div class="example-frame"><div class="example-picker" role="group" aria-label="준비된 예제">'+examples.map((v,i)=>'<button type="button" data-example="'+i+'" aria-pressed="false">'+esc(v.label||'본문 예제')+'</button>').join('')+'</div><div class="example-context"><h2></h2><p></p></div><div class="example-controls" role="group" aria-label="예제 단계 이동"><button type="button" data-action="first">처음</button><button type="button" data-action="prev">이전</button><output class="example-count"></output><button type="button" data-action="next">다음 단계 →</button><button type="button" data-action="last">결과</button></div><div class="example-note" role="status" aria-live="polite" aria-atomic="true"><h3></h3><p></p></div><div class="example-scene" tabindex="0" role="region" aria-label="예제 그림 · 방향키로 단계 이동"></div><p class="viz-legend"></p><div class="example-detail"></div></div><p class="example-help">그림에 초점을 두고 ← →로 이동 · Home 처음 · End 결과</p>';
- const draw=()=>{
+ root.innerHTML='<div class="worked-heading"><p class="eyebrow">예제 따라가기</p><p>다음 단계에서 바뀔 값을 먼저 예상해 보세요.</p></div><div class="example-frame"><div class="example-picker" role="group" aria-label="준비된 예제">'+examples.map((v,i)=>'<button type="button" data-example="'+i+'" aria-pressed="false">'+esc(v.label||'본문 예제')+'</button>').join('')+'</div><div class="example-context"><h2></h2><p></p></div><div class="example-controls" role="group" aria-label="예제 단계 이동"><button type="button" data-action="first" aria-label="첫 단계로 이동">처음</button><button type="button" data-action="prev" aria-label="이전 단계">이전</button><output class="example-count" aria-label="현재 단계" aria-live="off"></output><button type="button" data-action="next" aria-label="다음 단계">다음 <span aria-hidden="true">→</span></button><button type="button" data-action="last" aria-label="마지막 단계의 결과 보기">결과</button><div class="example-progress" aria-hidden="true"><span></span></div></div><div class="example-note" role="status" aria-live="polite" aria-atomic="true"><h3></h3><p></p></div><div class="example-scene" tabindex="0" role="region" aria-label="예제 그림 · 방향키로 단계 이동"></div><p class="viz-legend"></p><div class="example-detail"></div></div><div class="example-footer"><p class="example-help">그림에 초점을 두고 ← →로 이동 · Home 처음 · End 결과</p><button type="button" class="quiet" data-share>현재 단계 링크 복사</button><p class="share-status" role="status" aria-live="polite"></p></div>';
+ const scene=root.querySelector('.example-scene'),scrollers='.scroller,.viz-graph-scroll,.viz-cells,.viz-grid-wrap,.table-wrap';
+ const draw=(scrollPositions=[])=>{
   const v=examples[selected],s=v.steps[index];
   root.querySelector('.example-context h2').textContent=v.title;
   root.querySelector('.example-context p').textContent=v.description||'';
   root.querySelector('.viz-legend').textContent=s.html?'주황 테두리: 현재 판단 · 청록: 선택/확정 · 숫자와 글자로 상태를 함께 표시':legend(s);
-  root.querySelector('.example-scene').innerHTML=s.html||render(s);
+  scene.innerHTML=s.html||render(s);window.StudyPanels?.restore(scene);
+  scene.querySelectorAll(scrollers).forEach((el,i)=>{if(scrollPositions[i])el.scrollLeft=scrollPositions[i];});
   root.querySelector('.example-note h3').textContent=(index+1)+' / '+v.steps.length+' · '+s.title;
-  root.querySelector('.example-note p').textContent=s.note;
+  root.querySelector('.example-note p').textContent=s.note+(index===v.steps.length-1?' 마지막 단계입니다. 이전 단계로 돌아가거나 다른 예제를 선택해 보세요.':'');
   root.querySelector('.example-count').textContent=(index+1)+' / '+v.steps.length;
-  root.querySelector('.example-detail').innerHTML=v.detail||'';
+  root.querySelector('.example-progress span').style.width=((index+1)/v.steps.length*100)+'%';
+  if(detailKey!==v.key){const detail=root.querySelector('.example-detail');detail.innerHTML=v.detail||'';window.StudyPanels?.restore(detail);detailKey=v.key;}
   root.querySelectorAll('[data-example]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.example===selected)));
-  for(const action of ['first','prev'])root.querySelector('[data-action="'+action+'"]').disabled=index===0;
-  for(const action of ['last','next'])root.querySelector('[data-action="'+action+'"]').disabled=index===v.steps.length-1;
+  for(const action of ['first','prev'])root.querySelector('[data-action="'+action+'"]').setAttribute('aria-disabled',String(index===0));
+  for(const action of ['last','next'])root.querySelector('[data-action="'+action+'"]').setAttribute('aria-disabled',String(index===v.steps.length-1));
  };
- const move=action=>{index=action==='first'?0:action==='last'?examples[selected].steps.length-1:Math.max(0,Math.min(examples[selected].steps.length-1,index+(action==='next'?1:-1)));draw();};
- root.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>move(b.dataset.action));
- root.querySelectorAll('[data-example]').forEach(b=>b.onclick=()=>{selected=+b.dataset.example;index=0;draw();});
- root.querySelector('.example-scene').addEventListener('keydown',e=>{
-  if(e.target!==e.currentTarget||e.altKey||e.ctrlKey||e.metaKey)return;
-  const action={ArrowLeft:'prev',ArrowRight:'next',Home:'first',End:'last'}[e.key];
-  if(action){e.preventDefault();move(action);}
+ const sync=(push=false)=>window.StudyURL?.write({example:examples[selected].key,step:index+1,section:'example-visual'},{push});
+ // Read layout only after the user's action and the DOM update. Keep both bars clear of the note.
+ const revealNote=()=>requestAnimationFrame(()=>{
+  if(!root.isConnected)return;
+  const note=root.querySelector('.example-note'),rect=note.getBoundingClientRect(),bar=root.querySelector('.example-controls').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect();
+  const offset=header.bottom+bar.height+12;
+  if(rect.top<offset||rect.top>innerHeight-100)window.scrollBy({top:rect.top-offset,behavior:'instant'});
  });
+ const move=action=>{
+  const positions=[...scene.querySelectorAll(scrollers)].map(el=>el.scrollLeft);
+  const next=action==='first'?0:action==='last'?examples[selected].steps.length-1:Math.max(0,Math.min(examples[selected].steps.length-1,index+(action==='next'?1:-1)));
+  if(next===index)return;
+  index=next;draw(positions);sync();revealNote();
+ };
+ root.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{if(b.getAttribute('aria-disabled')!=='true')move(b.dataset.action);});
+ root.querySelectorAll('[data-example]').forEach(b=>b.onclick=()=>{
+  const next=+b.dataset.example;if(next===selected)return;
+  selected=next;index=0;draw();sync(true);root.querySelector('.share-status').textContent='';
+ });
+ scene.addEventListener('keydown',e=>{
+  if(e.target!==e.currentTarget||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
+  const action={ArrowLeft:'prev',ArrowRight:'next',Home:'first',End:'last'}[e.key];if(action){e.preventDefault();move(action);}
+ });
+ root.querySelector('[data-share]').onclick=async()=>{
+  sync();const status=root.querySelector('.share-status');
+  try{await navigator.clipboard.writeText(location.href);status.textContent='현재 예제와 단계의 링크를 복사했습니다.';}
+  catch{status.replaceChildren();const a=document.createElement('a');a.href=location.href;a.textContent='현재 단계 링크 열기';status.append('복사할 수 없습니다. 링크를 길게 누르거나 주소창에서 복사하세요. ',a);}
+ };
  draw();
 }};
 })();
