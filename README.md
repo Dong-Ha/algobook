@@ -6,8 +6,9 @@ C++ 기초 문법을 아는 학습자를 위한 코딩테스트 인터랙티브 
 
 - 학습 45장과 혼합 판단 연습 15문제
 - 45장 모두 본문 예시의 단계별 시각화: 배열·그래프·트리·격자·시간 구간·상태 전이
-- 입력 변경 실험 9종: 정렬, 누적합, 투 포인터, 이분탐색, 백트래킹, DFS, BFS, DP, Trie
-- 입력 변경, 이전·다음 단계, 자동 재생, 실행 속도 조절
+- 기존 입력 변경 실험 9종: 정렬, 누적합, 투 포인터, 이분탐색, 백트래킹, DFS, BFS, DP, Trie
+- 추가 확장 실험 3종: 용량 판정 이분탐색, 벽 편집 격자 BFS, LIS 꼬리 후보·부모 복원
+- 입력 변경, 이전·다음 단계, 자동 재생, 실행 속도 조절 (확장 실험은 수동 단계 이동)
 - 판단 문제 60개와 해설, 장별 작성 과제 45개와 접힌 기준 결과, C++17 예제, 적용 조건과 반례
 - 제곱근 분할·세그먼트 트리·LCA·비트마스크·LIS·스위핑 등 심화 과정
 - 상태 모델·국소 갱신·후보 필터·경로 평가·변경 영향·자원 상태·비트 집합·정렬 인덱스·지연 유효성·순위 집계의 개념 학습
@@ -41,6 +42,8 @@ python3 -m http.server 8000 --directory docs
 | `docs/visual-advanced.js` | 심화·개념 30장 예시 시각화 데이터 |
 | `privacy-checks.cjs` | 공개 파일의 원문 식별 정보 잔존 및 개념 학습 구조 검사 |
 | `visual-checks.cjs` | 전체 장 시각화 구조와 본문 입력·결과 검증 |
+| `docs/visual-study.html` | 외부 의존성 없는 확장 실험 3종, 정적·인쇄용 요약 그림 |
+| `deep-lab-checks.cjs` | 확장 실험을 완전탐색·Floyd·부분집합 기준 풀이와 비교 |
 | `docs/app.js` | 화면, 입력, 재생과 시각화 |
 | `checks.cjs` | 알고리즘 검증 및 C++ 예제 컴파일·실행 |
 
@@ -52,6 +55,7 @@ Node.js 18 이상과 C++17을 지원하는 `g++`가 필요합니다. 저장소 �
 node checks.cjs
 node visual-checks.cjs
 node privacy-checks.cjs
+node deep-lab-checks.cjs
 ```
 
 시각화 결과를 독립적인 기준 풀이와 비교하고, 본문의 C++ 예제 45개를 입력 맥락과 함께 컴파일·실행합니다. 추가 과정의 국소 갱신, 유효성 판정, 정렬 키 변경, 구간 질의, 순위, LIS, 스택, LCA, 방문 집합 DP 등을 작은 기준 풀이와 비교합니다.
@@ -73,3 +77,17 @@ Bellman-Ford 완화와 음수 사이클, Floyd 중간 정점, 제곱근 분할�
 사이트: https://dong-ha.github.io/algobook/
 
 GitHub Pages는 `main` 브랜치의 `/docs` 폴더를 게시 원본으로 사용합니다. `main`에 푸시하면 사이트가 자동으로 배포됩니다.
+
+## 확장 시각화 (2026-10-13)
+
+`binary`, `grid-search`, `lis` 장의 **조건을 바꿔, 원리 확인하기**에서 확장 실험을 엽니다. [독립 실험 페이지](https://dong-ha.github.io/algobook/visual-study.html)는 단일 HTML이며 외부 폰트·스크립트·서비스를 요청하지 않습니다. JavaScript가 꺼져 있거나 인쇄할 때는 완성된 기본 예제 그림을 제공합니다. 인쇄 그림은 사용자가 수정한 입력이 아닌 문서의 기본 예제입니다.
+
+- 용량 판정: 실제 날짜별 작업 분할, 답 후보 범위, 가능/불가능 및 경계 갱신 이유를 연결합니다.
+- 격자 BFS: 벽 편집, 큐, 발견 거리, 부모와 경로를 보여 줍니다. 전체 탐색 후 경로 하나를 복원합니다.
+- LIS: `tails=[2,4,6]`이 실제 부분수열이 아닌 반례와 `parent` 복원을 비교합니다.
+
+디자인 적용 근거와 검증 범위는 [diagram-design-review.md](diagram-design-review.md)를 참고하세요.
+
+정적 요약은 `docs/visual-study-summary.html`입니다. 기본 그림을 편집하면 `node scripts/build-diagram-summary.cjs`로 다시 생성하세요.
+
+선택적 화면 검증은 Playwright가 설치된 환경에서 `node deep-lab-browser-checks.cjs`로 실행합니다. 별도 Chromium을 사용할 때는 `ALGOBOOK_BROWSER`, 검수 이미지 출력 위치는 `ALGOBOOK_QA_DIR` 환경 변수를 지정합니다.
