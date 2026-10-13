@@ -1,0 +1,22 @@
+/* Textbook readiness, observable goals, and gradual self-check practice. */
+.learning-start{margin:40px 0;padding:28px;background:#f5f8fa;border:1px solid #d8e1e7;border-radius:12px}
+.learning-start>p{max-width:76ch;line-height:1.85}
+.learning-paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}
+.learning-path,.readiness{padding:16px;background:#fff;border:1px solid #d8e1e7;border-radius:8px}
+.learning-start summary,.staged-practice summary{cursor:pointer;font-weight:700;line-height:1.6;padding:8px 0;min-height:44px}
+.learning-start details p,.learning-path li{line-height:1.8}
+.learning-path ol{padding-left:24px}
+.learning-path a,.learning-guide a,.readiness a{color:#0f766e;text-decoration:underline;text-underline-offset:3px}
+.learning-guide{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin:24px 0;padding:22px;border:1px solid #d8e1e7;border-left:4px solid #0f766e;border-radius:8px;background:#f5f8fa}
+.learning-guide h2{font-size:18px;margin:0 0 12px}
+.learning-guide p,.learning-guide li{font-size:15px;line-height:1.85}
+.learning-guide ul{padding-left:20px;margin:0}
+.staged-practice .practice-stage{margin:16px 0;padding:16px;border:1px solid #cbd5df;border-radius:8px;background:#fff}
+.staged-practice h3{font-size:18px;margin:0 0 12px}
+.staged-practice .practice-stage details{padding:8px 12px;margin-top:12px;border-left:3px solid #cbd5df;background:#f5f8fa}
+.staged-practice p{overflow-wrap:anywhere}
+.learning-reflect{font-size:15px;color:#425365}
+.learning-start summary:focus-visible,.staged-practice summary:focus-visible{outline:3px solid #0f766e;outline-offset:4px;border-radius:3px}
+@media(max-width:900px){.learning-paths{grid-template-columns:1fr}}
+@media(max-width:700px){.learning-start{padding:18px}.learning-guide{grid-template-columns:1fr;gap:18px;padding:18px}.staged-practice .practice-stage{padding:12px}}
+@media print{.learning-paths,.learning-guide{display:block}.learning-guide{break-inside:avoid}.learning-start,.learning-guide{background:#fff;color:#000}.learning-path,.staged-practice .practice-stage{break-inside:avoid}}

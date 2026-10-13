@@ -21,16 +21,20 @@
   return url.pathname+url.search+url.hash;
  }
  window.StudyURL={write,chapter,section};
- const panelKeys=new Set(['exercise','example-code','prediction']);
+ const panelKeys=new Set(['exercise','example-code','prediction','basic-hint','basic-answer','application','application-hint','transfer','transfer-hint','transfer-answer']);
  function restorePanels(root){
   const open=new Set((new URLSearchParams(location.search).get('panels')||'').split(','));
+  // Old exercise-answer links and links to a hint must expose their containing stage.
+  if(open.has('exercise')||open.has('application-hint'))open.add('application');
+  if(open.has('transfer-hint')||open.has('transfer-answer'))open.add('transfer');
   root.querySelectorAll('details').forEach(el=>{
-   const key=el.closest('.example-detail')?'example-code':el.closest('.example-scene')?'prediction':el.classList.contains('exercise-answer')?'exercise':null;
+   const key=el.dataset.panel|| (el.closest('.example-detail')?'example-code':el.closest('.example-scene')?'prediction':el.classList.contains('exercise-answer')?'exercise':null);
    if(key){el.dataset.panel=key;el.open=open.has(key);}
   });
  }
  document.addEventListener('toggle',event=>{
   const el=event.target,key=el.dataset?.panel;if(!el.isConnected||!panelKeys.has(key))return;
+  if(!el.open&&(key==='application'||key==='transfer'))el.querySelectorAll('details[open]').forEach(child=>{child.open=false;});
   const open=new Set((new URLSearchParams(location.search).get('panels')||'').split(',').filter(k=>panelKeys.has(k)));
   if(el.open)open.add(key);else open.delete(key);
   write({panels:[...open].sort().join(',')});
