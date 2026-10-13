@@ -1500,3 +1500,17 @@ for (const [id, steps] of Object.entries({
   s.flow={label:'같은 bit 위치끼리 연산',items:s.title.includes('OR')?['A OR B → 어느 쪽에든 ON','A AND B → 양쪽 모두 ON','OR의 ON 개수 = 3']:s.title.includes('적용')?['0101 XOR 0011 = 0110','ON bit 2,1','차이 2개']:['0101: bit2,0 ON','0011: bit1,0 ON','bit0은 공통']};
  }
 }
+// Counterexamples complement the introductory snapshots with the same facts as visual-study.html.
+(() => {
+ const v=window.EXAMPLE_VISUALS;
+ v['grid-search'].steps.push(
+  {title:'벽과 우회: 좌표를 정점으로',note:'1은 통로, 0은 벽입니다. 왼쪽 위 S에서 오른쪽 아래 T까지 모든 이동 비용은 1입니다.',renderer:'traversal',grid:{label:'3행 × 4열 · #은 벽',values:[['S','1','1','#'],['#','1','#','1'],['1','1','1','T']],active:[[0,0]]},rows:[{label:'큐 · 앞 → 뒤',type:'queue',values:['(0,0)']}]},
+  {title:'발견할 때 거리와 부모 기록',note:'S의 오른쪽 (0,1)을 첫 발견합니다. dist[0][1]=1, parent[0][1]=(0,0)입니다. 큐에 넣을 때 표시하므로 중복 삽입하지 않습니다.',renderer:'traversal',grid:{label:'숫자는 최소 이동 수 · ·는 미발견',values:[[0,1,'·','#'],['#','·','#','·'],['·','·','·','T']],active:[[0,0]],selected:[[0,1]]},rows:[{label:'큐 · 앞 → 뒤',type:'queue',values:['(0,1)']}]},
+  {title:'거리와 복원 경로는 다르다',note:'전체 탐색 결과 T의 거리는 5입니다. T에서 parent를 역추적하면 (2,3)←(2,2)←(2,1)←(1,1)←(0,1)←(0,0)입니다. 시작 칸은 이동 수에 포함하지 않습니다.',renderer:'traversal',grid:{label:'전체 최소 거리 · 선택된 칸은 복원 경로',values:[[0,1,2,'#'],['#',2,'#',6],[4,3,4,5]],selected:[[0,0],[0,1],[1,1],[2,1],[2,2],[2,3]]},rows:[{label:'최소 이동 수',type:'state',values:[5]}],result:'5회 이동 · 경로는 6칸'}
+ );
+ v.lis.steps.push(
+  {title:'tails 반례: 교체 전 원본 순서',note:'입력 [3,5,6,2,4]의 앞 세 값을 처리하면 길이 1,2,3의 최소 꼬리는 [3,5,6]입니다. parent[2]=1, parent[1]=0을 기록합니다.',renderer:'dependency',rows:[{label:'입력',type:'array',values:[3,5,6,2,4],active:[2]},{label:'tails',type:'array',values:[3,5,6],indices:['길이 1','길이 2','길이 3']},{label:'부모 인덱스',type:'array',values:[-1,0,1,'미처리','미처리']}]},
+  {title:'작은 꼬리로 교체해도 과거 부모는 유지',note:'2로 길이 1의 꼬리를, 4로 길이 2의 꼬리를 교체합니다. tails=[2,4,6]의 원본 인덱스 [3,4,2]는 증가하지 않으므로 실제 부분수열이 아닙니다.',renderer:'dependency',rows:[{label:'입력',type:'array',values:[3,5,6,2,4],active:[4]},{label:'tails',type:'array',values:[2,4,6],indices:['길이 1','길이 2','길이 3'],active:[1]},{label:'tailIndex',type:'array',values:[3,4,2],indices:['길이 1','길이 2','길이 3']}]},
+  {title:'원본 인덱스를 따라 실제 LIS 복원',note:'길이 3의 tailIndex는 2입니다. parent를 따라 2→1→0으로 가고 뒤집으면 원본 인덱스 [0,1,2], 값 [3,5,6]이 됩니다.',renderer:'dependency',rows:[{label:'부모 인덱스',type:'array',values:[-1,0,1,-1,3],selected:[0,1,2]},{label:'복원한 원본 인덱스',type:'sequence',values:[0,1,2]},{label:'복원한 실제 LIS',type:'sequence',values:[3,5,6]}],result:'길이 3 · 실제 LIS [3,5,6]'}
+ );
+})();
