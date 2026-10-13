@@ -18,50 +18,55 @@ const server=http.createServer((req,res)=>{
   ctx.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
   await ctx.route('**/*',r=>{if(!r.request().url().startsWith(base)){requests.push(r.request().url());return r.abort();}return r.continue();});
   const p=await ctx.newPage();
-  async function geometry(page){return page.evaluate(()=>{
-   const problems=[];
-   for(const svg of document.querySelectorAll('svg')){if(!svg.getClientRects().length)continue;const box=svg.viewBox.baseVal;const ids=(svg.getAttribute('aria-labelledby')||'').split(' ');if(svg.firstElementChild?.tagName!=='title'||ids.some(id=>!document.getElementById(id)))problems.push('SVG accessible name');
-    for(const t of svg.querySelectorAll('text')){const b=t.getBBox();if(b.x<0||b.y<0||b.x+b.width>box.width+1||b.y+b.height>box.height+1)problems.push('text outside canvas: '+t.textContent);if(/[가-힣]/.test(t.textContent)&&parseFloat(getComputedStyle(t).fontSize)<12)problems.push('small Hangul');}
-    const wrap=svg.closest('.scroller');if(wrap&&svg.getBoundingClientRect().width>wrap.clientWidth+1){wrap.scrollLeft=wrap.scrollWidth;if(wrap.scrollLeft<1)problems.push('unreachable diagram edge');wrap.scrollLeft=0;}
-   }
-   if(document.documentElement.scrollWidth>innerWidth+1)problems.push('page overflow');
-   return problems;
-  });}
+  const ids=await (async()=>{await p.goto(base);return p.evaluate(()=>CHAPTERS.map(c=>c.id));})();
+  let examples=0,frames=0;
   for(const width of [1100,390]){
    await p.setViewportSize({width,height:900});
-   for(const id of ['binary','grid','lis']){
-    await p.goto(base+'/visual-study.html?lab='+id);await p.locator('#'+id+'.enhanced').waitFor();await p.evaluate(()=>document.fonts.ready);
-    assert.deepEqual(await geometry(p),[]);await p.locator('#'+id+' [data-action=last]').click();
-    assert.deepEqual(await geometry(p),[]);await p.screenshot({path:path.join(output,id+'-'+width+'.png'),fullPage:true});
-    const result=await p.locator('#'+id+' .outcome').textContent();assert.match(result,id==='binary'?/정답 18/:id==='grid'?/최소 이동 5회/:/길이 3/);
-    await p.locator('#'+id+' [data-action=first]').click();await p.locator('#'+id+' [data-action=next]').focus();await p.keyboard.press('Enter');assert.match(await p.locator('#'+id+' output').textContent(),/단계 1/);
-    report.push({id,width,geometry:'passed',keyboard:'passed',result});
+   for(const id of ids){
+    await p.goto(base+'/index.html#'+id);await p.locator('.example-frame').waitFor();
+    assert.equal(await p.locator('.example-frame').count(),1,id+' one figure');
+    assert.equal(await p.locator('input,textarea,select,form,iframe').count(),0,id+' no data input or duplicate embed');
+    assert(!/EXAMPLE WALKTHROUGH|INTERACTIVE LAB|EXTENDED VISUAL LAB/.test(await p.locator('main').innerText()));
+    const n=await p.locator('[data-example]').count();
+    for(let j=0;j<n;j++){
+     await p.locator('[data-example="'+j+'"]').click();
+     const control=p.locator('.example-controls'),note=p.locator('.example-note');
+     assert.equal(await control.locator('[data-action=prev]').isDisabled(),true);
+     const before=await note.innerText();
+     await control.locator('[data-action=next]').click();assert.notEqual(await note.innerText(),before);
+     if(await control.locator('[data-action=last]').isEnabled())await control.locator('[data-action=last]').click();assert.equal(await control.locator('[data-action=next]').isDisabled(),true);
+     const issues=await p.locator('.example-frame').evaluate(root=>{
+      const issues=[];
+      if(document.documentElement.scrollWidth>innerWidth+1)issues.push('page overflow');
+      for(const svg of root.querySelectorAll('svg')){
+       const box=svg.viewBox.baseVal,ids=(svg.getAttribute('aria-labelledby')||'').split(' ');
+       if(svg.firstElementChild?.tagName!=='title'||ids.length!==2||ids.some(id=>!document.getElementById(id)))issues.push('SVG accessibility');
+       for(const t of svg.querySelectorAll('text')){const b=t.getBBox();if(b.x< -1||b.y< -1||b.x+b.width>box.width+1||b.y+b.height>box.height+1)issues.push('text outside '+t.textContent);if(/[가-힣]/.test(t.textContent)&&parseFloat(getComputedStyle(t).fontSize)<12)issues.push('small Hangul');}
+      }
+      return issues;
+     });
+     assert.deepEqual(issues,[],id+' example '+j+' width '+width);
+     examples++;frames+=Number((await p.locator('.example-count').innerText()).split('/')[1]);
+    }
+    report.push({width,id,examples:n});
    }
   }
-  await p.goto(base+'/visual-study.html?lab=binary');
-  await p.locator('nav a[href="?lab=grid#grid"]').click();assert(await p.locator('#grid').isVisible());assert(!(await p.locator('#binary').isVisible()));
-  await p.locator('nav a[href="?lab=binary#binary"]').click();
-  for(const [preset,answer]of [['one-day',32],['each-day',10],['single',10]]){await p.locator('[data-binary-preset='+preset+']').click();const end=p.locator('#binary [data-action=last]');if(await end.isEnabled())await end.click();assert.match(await p.locator('#binary .outcome').textContent(),new RegExp('정답 '+answer));}
-  await p.locator('#binary input[name=array]').fill('0');await p.locator('#binary button[type=submit]').click();assert.match(await p.locator('#binary .error').textContent(),/1~10000/);
-  await p.locator('#binary input[name=array]').fill('10000,10000,10000,10000,10000,10000,10000,10000,10000');await p.locator('#binary input[name=days]').fill('1');await p.locator('#binary button[type=submit]').click();await p.locator('#binary [data-action=last]').click();assert.match(await p.locator('#binary .outcome').textContent(),/90000/);assert.deepEqual(await geometry(p),[]);
-  await p.goto(base+'/visual-study.html?lab=grid');await p.locator('[data-grid-preset=blocked]').click();await p.locator('#grid [data-action=last]').click();assert.match(await p.locator('#grid .outcome').textContent(),/도달 불가/);
-  await p.locator('[data-grid-preset=same]').click();await p.locator('#grid [data-action=last]').click();assert.match(await p.locator('#grid .outcome').textContent(),/최소 이동 0회/);
-  await p.locator('[data-grid-preset=detour]').click();await p.locator('[data-cell="0,1"]').click();assert.equal(await p.locator('[data-cell="0,1"]').getAttribute('aria-pressed'),'true');assert(await p.locator('[data-cell="0,1"]').evaluate(e=>e===document.activeElement));
-  await p.goto(base+'/visual-study.html?lab=lis');
-  for(const [preset,len]of [['duplicates',1],['empty',0],['descending',1]]){await p.locator('[data-lis-preset='+preset+']').click();await p.locator('#lis [data-action=last]').click();assert.match(await p.locator('#lis .outcome').textContent(),new RegExp('길이 '+len));}
-  await p.locator('#lis input[name=array]').fill('-10000,-9000,-8000,-7000,-6000,-5000,-4000,-3000,10000');await p.locator('#lis button[type=submit]').click();await p.locator('#lis [data-action=last]').click();assert.deepEqual(await geometry(p),[]);
-  // Main chapter embeds resize through a scoped same-origin message and work on mobile.
-  for(const [chapter,id]of [['binary','binary'],['grid-search','grid'],['lis','lis']]){
-   await p.goto(base+'/#'+chapter);const iframe=p.locator('iframe[data-study-lab]');await iframe.scrollIntoViewIfNeeded();const frame=await (await iframe.elementHandle()).contentFrame();await frame.locator('#'+id+'.enhanced').waitFor();await frame.locator('#'+id+' [data-action=last]').click();
-   await p.waitForFunction(()=>{const f=document.querySelector('iframe[data-study-lab]');return f&&f.style.height&&f.clientHeight>=f.contentDocument.documentElement.offsetHeight;});assert.deepEqual(await geometry(p),[]);assert.deepEqual(await geometry(frame),[]);
-   report.push({chapter,embed:'passed',height:await iframe.evaluate(e=>e.clientHeight)});
+  for(const [id,example,expected]of [['binary','capacity','정답 18'],['grid-search','detour','최소 이동 5회'],['grid-search','blocked','도달 불가'],['grid-search','same','최소 이동 0회'],['lis','reconstruct','[3, 5, 6]'],['lis','duplicates','길이 1']]){
+   await p.goto(base+'/index.html?example='+example+'#'+id);await p.locator('.example-frame').waitFor();
+   await p.locator('.example-scene').focus();await p.keyboard.press('End');assert((await p.locator('.example-scene').innerText()).includes(expected),expected);
+   await p.keyboard.press('Home');assert((await p.locator('.example-count').innerText()).startsWith('1 /'));
+   await p.keyboard.press('ArrowRight');assert((await p.locator('.example-count').innerText()).startsWith('2 /'));
+   await p.setViewportSize({width:1100,height:900});await p.locator('#example-visual').screenshot({animations:'disabled',style:'.topbar,.skip{visibility:hidden!important}.example-scene{outline:none!important}.example-controls{position:static!important}',path:path.join(output,id+'-'+example+'-desktop.png')});
+   await p.setViewportSize({width:390,height:900});await p.locator('#example-visual').screenshot({animations:'disabled',style:'.topbar,.skip{visibility:hidden!important}.example-scene{outline:none!important}.example-controls{position:static!important}',path:path.join(output,id+'-'+example+'-mobile.png')});
   }
-  const nojs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),staticPage=await nojs.newPage();await staticPage.goto(base+'/visual-study.html');assert.equal(await staticPage.locator('.static-summary:visible').count(),3);assert.equal(await staticPage.locator('.interactive:visible').count(),0);assert.deepEqual(await geometry(staticPage),[]);
-  await p.goto(base+'/visual-study.html');await p.emulateMedia({media:'print'});assert.equal(await p.locator('.static-summary:visible').count(),3);assert.equal(await p.locator('.interactive:visible').count(),0);assert.equal(await p.locator('svg').first().evaluate(e=>getComputedStyle(e).minWidth),'0px');
-  await p.emulateMedia({media:'screen',reducedMotion:'reduce'});await p.locator('#binary [data-action=last]').click();assert.match(await p.locator('#binary .outcome').textContent(),/18/);
-  await p.emulateMedia({media:'screen',reducedMotion:'no-preference'});await p.goto(base+'/visual-study-summary.html');assert.equal(await p.locator('svg').count(),3);assert.equal(await p.locator('script').count(),0);assert.deepEqual(await geometry(p),[]);
+  for(const [old,id,key]of [['binary','binary','capacity'],['grid','grid-search','detour'],['lis','lis','reconstruct']]){
+   await p.goto(base+'/visual-study.html?lab='+old);await p.waitForURL('**/index.html?example='+key+'#'+id);await p.locator('.example-frame').waitFor();
+  }
+  await p.emulateMedia({reducedMotion:'reduce'});await p.locator('[data-action=next]').click();assert((await p.locator('.example-count').innerText()).startsWith('2 /'));
+  await p.emulateMedia({media:'print'});assert.equal(await p.locator('.example-controls').isVisible(),false);assert.equal(await p.locator('.example-scene').isVisible(),true);
+  const nojs=await browser.newContext({javaScriptEnabled:false});const fallback=await nojs.newPage();await fallback.goto(base+'/index.html');assert(await fallback.locator('noscript a[href="visual-study-summary.html"]').isVisible());await fallback.goto(base+'/visual-study-summary.html');assert.equal(await fallback.locator('svg').count(),3);assert.equal(await fallback.locator('input,textarea,form').count(),0);await nojs.close();
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
-  fs.writeFileSync(path.join(output,'report.json'),JSON.stringify({report,errors,requests,noJS:'passed',print:'passed',reducedMotion:'passed'},null,2));
-  console.log(JSON.stringify({screens:6,embeds:3,edgeCases:'passed',noJS:'passed',print:'passed',reducedMotion:'passed',errors,externalRequests:requests,output}));
- }finally{await browser.close();server.close();}
-})().catch(e=>{console.error(e);server.close();process.exitCode=1;});
+  fs.writeFileSync(path.join(output,'report.json'),JSON.stringify({report,examples,frames,errors,externalRequests:requests},null,2));
+  console.log(JSON.stringify({chapters:ids.length,widths:[1100,390],exampleVisits:examples,framesRepresented:frames,errors,externalRequests:requests,output,status:'passed'}));
+ }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
+})().catch(e=>{console.error(e);process.exitCode=1;server.close();});

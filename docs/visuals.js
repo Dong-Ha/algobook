@@ -148,9 +148,10 @@ for(const [kind,input] of Object.entries(inputs)){
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Semantic state classes are shared by diagrams, cells, edges and legends.
 const stateClass=x=>x.active?'viz-active':x.dependency?'viz-dependency':x.selected?'viz-selected':x.discarded?'viz-discarded':x.frontier?'viz-frontier':'';
+let diagramNumber=0;
 function graph(g,title){
- const byId=new Map(g.nodes.map(n=>[n.id,n])),w=g.width||600,h=g.height||300;
- let html='<div class="viz-graph-scroll" tabindex="0" role="group" aria-label="'+esc(title)+' · 좌우 이동 가능한 도식"><svg class="example-graph" viewBox="0 0 '+w+' '+h+'" style="min-width:'+Math.min(w,560)+'px" role="img" aria-label="'+esc(title)+'"><title>'+esc(title)+'</title>';
+ const byId=new Map(g.nodes.map(n=>[n.id,n])),w=g.width||600,h=Math.max(g.height||300,...g.nodes.map(n=>n.y+(n.caption?n.captionDy??43:25)+20)),uid="example-diagram-"+(++diagramNumber);
+ let html='<div class="viz-graph-scroll" tabindex="0" role="group" aria-label="'+esc(title)+' · 좌우 이동 가능한 도식"><svg class="example-graph" viewBox="0 0 '+w+' '+h+'" style="width:'+w+'px;min-width:'+w+'px" role="img" aria-labelledby="'+uid+'-title '+uid+'-desc"><title id="'+uid+'-title">'+esc(title)+'</title><desc id="'+uid+'-desc">'+esc(title)+' · '+g.nodes.length+'개 정점과 '+g.edges.length+'개 연결. 각 정점의 값과 상태를 함께 표시합니다.</desc>';
  for(const e of g.edges){const a=byId.get(e.from),b=byId.get(e.to),dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,x1=a.x+25*dx/d,y1=a.y+25*dy/d,x2=b.x-28*dx/d,y2=b.y-28*dy/d;
   html+='<g class="viz-edge '+stateClass(e)+'"><title>'+esc(e.from)+' → '+esc(e.to)+' · '+(e.active?'현재 검사':e.dependency?'이전 상태 참조':e.selected?'선택된 경로':e.discarded?'제외된 간선':'미처리 간선')+'</title>';
   if(a.id===b.id)html+='<circle class="viz-loop" cx="'+a.x+'" cy="'+(a.y-28)+'" r="23"/>';
@@ -277,9 +278,35 @@ function enrichAdvanced(v){
  });
 }
 window.VisualPrimitives={graph,sequence,flow,traversalGraph,trieGraph,fromTrace,enrichAdvanced};
-window.ExampleVisuals={render,legend,mount(id,root){const v=visuals[id];if(!v)return;let index=0;
- root.innerHTML='<div class="lab-title"><div><p class="eyebrow">EXAMPLE WALKTHROUGH</p><h2>'+esc(v.title)+'</h2></div><span class="lab-badge">본문 예시</span></div><div class="example-frame"><p class="viz-legend"></p><div class="example-scene"></div><div class="example-note" aria-live="polite"><h3></h3><p></p></div><div class="example-controls"><button type="button" data-action="first">처음</button><button type="button" data-action="prev">이전</button><label>실행 단계 <input type="range" min="0" max="'+(v.steps.length-1)+'" value="0"></label><button type="button" data-action="next">다음 단계</button><button type="button" data-action="last">결과</button><span class="example-count"></span></div></div>';
- const draw=()=>{const s=v.steps[index];root.querySelector('.viz-legend').textContent=legend(s);root.querySelector('.example-scene').innerHTML=render(s);root.querySelector('.example-note h3').textContent=s.title;root.querySelector('.example-note p').textContent=s.note;root.querySelector('input').value=index;root.querySelector('.example-count').textContent=(index+1)+' / '+v.steps.length;for(const action of ['first','prev'])root.querySelector('[data-action="'+action+'"]').disabled=index===0;for(const action of ['last','next'])root.querySelector('[data-action="'+action+'"]').disabled=index===v.steps.length-1;};
- root.querySelectorAll('button').forEach(b=>b.onclick=()=>{index=b.dataset.action==='first'?0:b.dataset.action==='last'?v.steps.length-1:Math.max(0,Math.min(v.steps.length-1,index+(b.dataset.action==='next'?1:-1)));draw();});root.querySelector('input').oninput=e=>{index=+e.target.value;draw();};draw();
+window.ExampleVisuals={render,legend,mount(id,root){
+ const examples=window.WorkedExamples?.catalogue[id]||[visuals[id]];
+ if(!examples[0])return;
+ const requested=new URLSearchParams(location.search).get('example');
+ let selected=Math.max(0,examples.findIndex(v=>v.key===requested)),index=0;
+ root.setAttribute('aria-label','예제 따라가기');
+ root.innerHTML='<div class="worked-heading"><p class="eyebrow">예제 따라가기</p><p>다음 단계에서 바뀔 값을 먼저 예상해 보세요.</p></div><div class="example-frame"><div class="example-picker" role="group" aria-label="준비된 예제">'+examples.map((v,i)=>'<button type="button" data-example="'+i+'" aria-pressed="false">'+esc(v.label||'본문 예제')+'</button>').join('')+'</div><div class="example-context"><h2></h2><p></p></div><div class="example-controls" role="group" aria-label="예제 단계 이동"><button type="button" data-action="first">처음</button><button type="button" data-action="prev">이전</button><output class="example-count"></output><button type="button" data-action="next">다음 단계 →</button><button type="button" data-action="last">결과</button></div><div class="example-note" role="status" aria-live="polite" aria-atomic="true"><h3></h3><p></p></div><div class="example-scene" tabindex="0" role="region" aria-label="예제 그림 · 방향키로 단계 이동"></div><p class="viz-legend"></p><div class="example-detail"></div></div><p class="example-help">그림에 초점을 두고 ← →로 이동 · Home 처음 · End 결과</p>';
+ const draw=()=>{
+  const v=examples[selected],s=v.steps[index];
+  root.querySelector('.example-context h2').textContent=v.title;
+  root.querySelector('.example-context p').textContent=v.description||'';
+  root.querySelector('.viz-legend').textContent=s.html?'주황 테두리: 현재 판단 · 청록: 선택/확정 · 숫자와 글자로 상태를 함께 표시':legend(s);
+  root.querySelector('.example-scene').innerHTML=s.html||render(s);
+  root.querySelector('.example-note h3').textContent=(index+1)+' / '+v.steps.length+' · '+s.title;
+  root.querySelector('.example-note p').textContent=s.note;
+  root.querySelector('.example-count').textContent=(index+1)+' / '+v.steps.length;
+  root.querySelector('.example-detail').innerHTML=v.detail||'';
+  root.querySelectorAll('[data-example]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.example===selected)));
+  for(const action of ['first','prev'])root.querySelector('[data-action="'+action+'"]').disabled=index===0;
+  for(const action of ['last','next'])root.querySelector('[data-action="'+action+'"]').disabled=index===v.steps.length-1;
+ };
+ const move=action=>{index=action==='first'?0:action==='last'?examples[selected].steps.length-1:Math.max(0,Math.min(examples[selected].steps.length-1,index+(action==='next'?1:-1)));draw();};
+ root.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>move(b.dataset.action));
+ root.querySelectorAll('[data-example]').forEach(b=>b.onclick=()=>{selected=+b.dataset.example;index=0;draw();});
+ root.querySelector('.example-scene').addEventListener('keydown',e=>{
+  if(e.target!==e.currentTarget||e.altKey||e.ctrlKey||e.metaKey)return;
+  const action={ArrowLeft:'prev',ArrowRight:'next',Home:'first',End:'last'}[e.key];
+  if(action){e.preventDefault();move(action);}
+ });
+ draw();
 }};
 })();

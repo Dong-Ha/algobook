@@ -78,10 +78,3 @@
 .viz-graph-scroll:focus-visible{outline:3px solid #0f766e;outline-offset:3px}
 @media(max-width:600px){.viz-graph-scroll::before{content:'↔ 좌우로 이동하여 전체 구조 보기';display:block;position:sticky;left:0;font-size:11px;color:#526777;margin-bottom:10px}.viz-array .viz-cells::after,.viz-bitset .viz-cells::after{content:'';flex:none;width:4px}}
 .viz-state .viz-token.viz-active{background:#fff0e5;border-left-color:#c65d22}.viz-state .viz-token.viz-selected{background:#e2f4ef;border-left-color:#0f766e}.viz-state .viz-token.viz-discarded{background:#edf1f3;border-left-color:#ccd5dc}
-
-/* Self-contained visual-study labs keep diagram overflow inside each scene. */
-.deep-study{margin:40px 0;min-width:0;scroll-margin-top:90px}
-.deep-study>.section-head{margin-bottom:20px;gap:16px;flex-wrap:wrap}
-.deep-study>.section-head .text-link{font-size:14px}
-.deep-study-frame{display:block;border:0;width:100%;height:1450px;background:#fff}
-@media print{.deep-study-frame{display:none}.deep-study::after{content:'확장 시각화 자료는 큰 화면으로 열기 링크에서 인쇄할 수 있습니다.';font-size:14px}}
