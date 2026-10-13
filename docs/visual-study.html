@@ -4,23 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AlgoBook · 조건에서 다음 상태로</title>
-<meta name="description" content="용량 이분탐색, 격자 BFS, LIS 복원을 입력과 반례로 실험하는 C++ 학습 자료">
-<style>
-:root{--paper:#fff;--paper-2:#f4f7fa;--ink:#112235;--muted:#526579;--rule:#dce4eb;--accent:#a74414;--accent-tint:#fff0e5;--teal:#0f766e;--teal-tint:#e8f5f2;--sans:Inter,Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--mono:Consolas,"Liberation Mono",monospace}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 var(--sans);word-break:keep-all;overflow-wrap:anywhere}main{max-width:1000px;margin:auto;padding:40px 24px}h1,h2,h3,p{margin:0}h1{font-size:32px;line-height:1.4}h2{font-size:25px;line-height:1.4}h3{font-size:17px}a{color:var(--teal)}button,input,select,textarea{font:inherit}button,summary{cursor:pointer}button{min-height:44px;padding:8px 14px;border:1px solid var(--rule);background:#fff;border-radius:6px;color:var(--ink)}button:hover{background:var(--paper-2)}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible,.scroller:focus-visible{outline:3px solid var(--teal);outline-offset:3px}input,textarea{width:100%;padding:10px;border:1px solid #8797a5;border-radius:6px;background:white;color:var(--ink)}textarea{font-family:var(--mono);resize:vertical}label{display:block;font-size:14px;font-weight:600}label input,label textarea{margin-top:6px}small,.muted{color:var(--muted)}code,.number{font-family:var(--mono)}code{overflow-wrap:anywhere}nav{display:flex;flex-wrap:wrap;gap:16px;margin:20px 0 40px}.eyebrow{color:var(--teal);font:600 12px/1.6 var(--mono);letter-spacing:.1em;margin-bottom:8px}.intro{max-width:700px;color:var(--muted);margin:12px 0 24px}.lesson{margin:0 0 64px;min-width:0}.lesson>header{border-top:2px solid var(--ink);padding-top:24px}.lesson>header p:last-child{margin-top:10px;color:var(--muted)}.concept{border-left:3px solid var(--teal);padding:12px 16px;background:var(--teal-tint);margin:20px 0}.concept b{display:block}.panel{border:1px solid var(--rule);border-radius:8px;margin-top:20px;overflow:hidden;min-width:0}.settings{padding:20px;background:var(--paper-2);border-bottom:1px solid var(--rule)}.fields{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:16px}.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.presets button{font-size:14px;background:white}.primary{background:var(--ink)!important;color:white}.error{color:#a02b1e;font-size:14px;min-height:24px;margin-top:8px}.view{padding:20px;min-width:0}.view h3{margin:16px 0 8px}.view h3:first-child{margin-top:0}.scroller{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;min-width:0}.scroller svg{display:block;width:var(--canvas,640px);min-width:var(--canvas,640px);font-family:var(--sans)}svg text{fill:var(--ink);font-size:14px}svg .caption{font-size:12px;fill:var(--muted)}svg .value{font:600 18px var(--mono)}svg .cell{fill:white;stroke:#718496;stroke-width:1.5}svg .active{fill:var(--accent-tint);stroke:var(--accent);stroke-width:2.5}svg .selected{fill:var(--teal-tint);stroke:var(--teal);stroke-width:2}svg .dim{fill:var(--paper-2);stroke:var(--rule)}svg .arrow{fill:none;stroke:var(--teal);stroke-width:2}svg .wall{fill:var(--ink);stroke:var(--ink)}svg .wall-text{fill:white}.legend{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px;margin-top:8px}.legend b{color:var(--ink)}.status{padding:14px 20px;background:var(--paper-2);border-top:1px solid var(--rule);min-height:76px}.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px 20px;border-top:1px solid var(--rule)}.controls output{margin-left:auto;font:14px var(--mono)}.controls label{flex-basis:100%;font-weight:400}.controls input{padding:0;accent-color:var(--teal)}.pairs{display:grid;grid-template-columns:1fr 1fr;gap:16px}.note{font-size:14px;color:var(--muted);margin:10px 0}.state-line{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}.badge{padding:5px 10px;background:var(--paper-2);border:1px solid var(--rule);border-radius:4px;font:14px var(--mono)}.outcome{font-weight:700;color:var(--teal);padding:12px 0}.pack{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--rule)}.pack>strong{min-width:54px;font-size:14px}.token{display:inline-block;padding:4px 10px;border:1px solid #718496;border-radius:4px;font-family:var(--mono);background:white}.pack>span:last-child{margin-left:auto;font-size:14px}.question{margin-top:16px;padding:12px 16px;border:1px dashed #718496;border-radius:6px}.question summary{font-weight:600;min-height:32px}.question p{padding-top:8px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:9px;text-align:left;border-bottom:1px solid var(--rule)}th{background:var(--paper-2)}pre{background:var(--paper-2);padding:20px;overflow:auto;max-width:100%;font:13px/1.8 var(--mono);tab-size:4}.code{margin-top:20px}.code summary{font-weight:600;min-height:44px}.static-summary{margin:20px 0}.static-summary figcaption{font-size:14px;color:var(--muted);margin-top:8px}.enhanced .static-summary{display:none}.print-summary{display:none}.interactive[hidden],[hidden]{display:none!important}.editor{display:grid;gap:5px;grid-template-columns:repeat(var(--cols),44px);width:max-content;margin:12px 0}.editor button{width:44px;padding:0;min-height:44px;font:14px var(--mono)}.editor button[aria-pressed=true]{background:var(--ink);color:white}.editor button:disabled{opacity:1;background:var(--teal-tint);color:var(--teal)}.embed main{padding:0;max-width:none}.embed .page-header,.embed nav,.embed footer{display:none}.embed .lesson{margin-bottom:12px}.embed .lesson>header{border-top:0;padding-top:0}.embed h2{font-size:24px}.embed .intro{display:none}.subsequence{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.subsequence span{font-family:var(--mono)}footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:20px}footer p{margin:8px 0}
-@media(max-width:600px){.scroller:has(svg)::after{content:"↔ 그림을 좌우로 밀어 확인하세요";display:block;color:var(--muted);font-size:12px;margin:8px 0}main{padding:24px 16px}.fields,.pairs{grid-template-columns:1fr}.settings,.view{padding:16px}.controls{padding:12px;gap:6px}.controls button{padding:8px 10px;font-size:14px}.controls output{width:100%;margin:0}h1{font-size:27px}h2{font-size:23px}.embed h2{font-size:22px}.pack>span:last-child{margin-left:0;width:100%}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-@media print{main{max-width:none;padding:0}.interactive,.code,nav{display:none!important}.enhanced .static-summary,.print-summary{display:block}.scroller{overflow:visible}.scroller svg{min-width:0;width:100%}.lesson{break-inside:avoid;margin-bottom:32px}footer{display:none}}
+<meta name="description" content="용량 이분탐색, 격자 BFS, LIS 복원을 예제와 반례로 이해하는 C++ 학습 자료">
+<style>:root{--paper:#fff;--ink:#112235;--muted:#526579;--teal:#0f766e;--sans:Inter,Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--mono:Consolas,"Liberation Mono",monospace}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.8 var(--sans);word-break:keep-all;overflow-wrap:anywhere}main{max-width:960px;margin:auto;padding:40px 24px}h1{font-size:32px}h2{font-size:25px}a{color:var(--teal)}nav{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}.eyebrow{font:600 12px var(--mono);color:var(--teal);letter-spacing:.08em}.intro,figcaption,.note{color:var(--muted);font-size:14px}.lesson{margin:40px 0;border-top:1px solid #dce4eb;padding-top:24px}.concept{border-left:3px solid var(--teal);background:#e8f5f2;padding:16px}.concept b{display:block}.static-summary{margin:24px 0}.scroller{overflow-x:auto;max-width:100%}.scroller svg{display:block;width:640px;min-width:640px;font-family:var(--sans)}svg text{fill:var(--ink);font-size:14px}svg .caption{fill:var(--muted);font-size:12px}svg .value{font:600 18px var(--mono)}svg .cell{fill:white;stroke:#718496;stroke-width:1.5}svg .active{fill:#fff0e5;stroke:#a74414;stroke-width:2}svg .selected{fill:#e8f5f2;stroke:var(--teal);stroke-width:2}details{margin:20px 0;font-size:14px}summary{cursor:pointer;font-weight:600;min-height:44px}pre{font:13px/1.8 var(--mono);overflow:auto;padding:20px;background:#f4f7fa}footer{font-size:13px;color:var(--muted);border-top:1px solid #dce4eb;padding-top:20px}a:focus-visible,summary:focus-visible,.scroller:focus-visible{outline:3px solid var(--teal);outline-offset:3px}@media(max-width:600px){main{padding:24px 16px}.scroller::after{content:'↔ 그림을 좌우로 밀어 확인하세요';display:block;font-size:12px;color:var(--muted)}}@media print{nav,footer,details{display:none}main{padding:0}.lesson{break-inside:avoid}.scroller{overflow:visible}.scroller svg{width:100%;min-width:0}.scroller::after{display:none}}
 </style>
 </head>
 <body><main>
-<header class="page-header"><p class="eyebrow">ALGOBOOK / VISUAL STUDY</p><h1>조건에서 다음 상태로.</h1><p class="intro">입력을 바꾸고, 다음 선택을 예상하고, 근거를 확인하세요. 정답뿐 아니라 버린 후보와 보존한 상태를 살펴봅니다.</p></header>
-<nav aria-label="실험 목차"><a href="visual-study-summary.html">인쇄용 요약</a><a href="?lab=binary#binary">01 용량 이분탐색</a><a href="?lab=grid#grid">02 격자 BFS</a><a href="?lab=lis#lis">03 LIS 복원</a></nav>
+<header class="page-header"><p class="eyebrow">ALGOBOOK / VISUAL STUDY</p><h1>조건에서 다음 상태로.</h1><p class="intro">준비된 예제를 보고, 다음 선택을 예상하고, 근거를 확인하세요. 정답뿐 아니라 버린 후보와 보존한 상태를 살펴봅니다.</p></header>
+<nav aria-label="예제 목차"><a href="index.html">교과서 열기</a><a href="visual-study-summary.html">인쇄용 요약</a><a href="index.html?example=capacity#binary">01 용량 이분탐색</a><a href="index.html?example=detour#grid-search">02 격자 BFS</a><a href="index.html?example=reconstruct#lis">03 LIS 복원</a></nav>
 <section class="lesson" id="binary" data-lab="binary">
 <header><p class="eyebrow">01 / BOUNDARY SEARCH</p><h2>최소 용량은 어디서 가능해질까?</h2><p>작업 순서를 유지하고 작업을 쪼개지 않습니다. 양의 작업량을 D일 이내에 처리하는 최소 하루 용량 C를 찾습니다.</p></header>
 <div class="concept"><b>불변식 · 최소 가능한 용량은 [lo, hi] 안에 있습니다.</b>용량을 늘려도 필요한 날짜 수는 늘지 않습니다. 가능한 mid는 답 후보로 남기고, 불가능한 mid 이하는 버립니다.</div>
 <figure class="static-summary"><div class="scroller" tabindex="0" role="region" aria-label="용량 17과 18 비교 그림, 가로 스크롤 가능"><svg viewBox="0 0 640 244" role="img" aria-labelledby="binary-static-title binary-static-desc"><title id="binary-static-title">용량 17은 불가능, 18은 가능</title><desc id="binary-static-desc">작업량 7, 2, 5, 10, 8을 순서대로 처리할 때 용량 17은 3일, 18은 2일이 필요합니다.</desc><text x="40" y="36">작업량 [7, 2, 5, 10, 8] · D = 2</text><rect x="40" y="56" width="560" height="64" rx="6" class="cell"/><text x="56" y="82">C = 17</text><text x="56" y="106" class="caption">[7,2,5] / [10] / [8] · 3일 → 불가능</text><rect x="40" y="136" width="560" height="64" rx="6" class="active"/><text x="56" y="162">C = 18 · 최초 가능</text><text x="56" y="186" class="caption">[7,2,5] / [10,8] · 2일 → 가능</text><text x="40" y="228" class="caption">판정: 필요한 날짜 수 ≤ D · 가능하면 hi = mid</text></svg></div><figcaption>17은 불가능하고 18은 가능하므로, 단조성에 의해 최소 용량은 18입니다.</figcaption></figure>
-<div class="interactive" hidden><div class="panel"><form class="settings" data-form="binary"><div class="fields"><label>작업량 · 양의 정수 1~9개<input name="array" value="7, 2, 5, 10, 8" autocomplete="off"></label><label>제한 날짜 D<input name="days" type="number" min="1" max="9" value="2"></label></div><div class="presets"><button class="primary" type="submit">입력 적용</button><button type="button" data-binary-preset="basic">기본 · 18</button><button type="button" data-binary-preset="one-day">하루에 모두</button><button type="button" data-binary-preset="each-day">하루에 하나씩</button><button type="button" data-binary-preset="single">단일 작업</button></div><p class="error" role="alert"></p></form><div class="view" data-view="binary"></div><p class="status" role="status" aria-live="polite" aria-atomic="true"></p><div class="controls" data-controls="binary"></div></div></div>
+
 <details class="question"><summary>왜 하루를 최대한 채워도 될까요?</summary><p>양의 작업을 순서대로 처리할 때, 더 일찍 하루를 끝내는 방법보다 현재 용량 안에서 최대한 진행하는 방법이 처리한 접두사를 짧게 만들지 않습니다. 날짜마다 이를 반복하면 최소 필요 날짜를 얻습니다. 작업 재정렬이나 분할을 허용하는 문제에는 같은 모델을 그대로 적용하지 않습니다.</p></details>
 <details class="code"><summary>C++17 · 판정 함수에서 정답까지</summary><pre><code>bool feasible(const vector&lt;long long&gt;&amp; a, int days, long long cap) {
     int used = 1;
@@ -48,132 +43,19 @@ long long minimumCapacity(const vector&lt;long long&gt;&amp; a, int days) {
 <header><p class="eyebrow">02 / FRONTIER &amp; PATH</p><h2>도착하기 전, 큐에는 무엇이 남을까?</h2><p>상하좌우 이동 비용은 모두 1입니다. 왼쪽 위 S에서 오른쪽 아래 T까지 최소 이동 횟수와 경로 하나를 찾습니다.</p></header>
 <div class="concept"><b>불변식 · 처음 큐에 넣을 때 거리와 부모를 기록합니다.</b>큐에는 먼저 발견한 칸부터 들어 있습니다. 같은 칸을 다시 넣지 않으며, 방문 거리와 최종 경로는 서로 다른 정보입니다.</div>
 <figure class="static-summary"><div class="scroller" tabindex="0" role="region" aria-label="격자 BFS 최종 거리 그림, 가로 스크롤 가능"><svg viewBox="0 0 640 264" role="img" aria-labelledby="grid-static-title grid-static-desc"><title id="grid-static-title">벽을 우회한 최소 이동 횟수는 5</title><desc id="grid-static-desc">1110, 0101, 1111 격자에서 시작점부터 거리는 첫 행 0, 1, 2, 벽, 둘째 행 벽, 2, 벽, 6, 마지막 행 4, 3, 4, 5입니다.</desc><text x="40" y="36">전체 BFS 거리 · # = 벽</text><rect x="40" y="52" width="280" height="160" rx="6" class="cell"/><text x="64" y="88" class="value">S:0  1   2   #</text><text x="64" y="136" class="value"> #   2   #   6</text><text x="64" y="184" class="value"> 4   3   4  T:5</text><text x="348" y="80">복원 경로</text><text x="348" y="112" class="caption">(0,0) → (0,1) → (1,1)</text><text x="348" y="140" class="caption">→ (2,1) → (2,2) → (2,3)</text><text x="40" y="244" class="caption">거리: 시작부터 최소 이동 수 · 부모: 이 칸을 처음 발견한 이전 칸</text></svg></div><figcaption>목적지 거리 5와 부모 연결을 이용합니다. 시작 칸은 이동 횟수에 포함하지 않습니다.</figcaption></figure>
-<div class="interactive" hidden><div class="panel"><form class="settings" data-form="grid"><label>격자 · 1은 통로, 0은 벽 (최대 5행 × 7열)<textarea name="grid" rows="3" spellcheck="false">1110
-0101
-1111</textarea></label><div class="presets"><button type="submit" class="primary">격자 적용</button><button type="button" data-grid-preset="detour">벽 우회</button><button type="button" data-grid-preset="blocked">도달 불가</button><button type="button" data-grid-preset="same">출발 = 도착</button></div><p class="note">아래 칸을 누르면 벽/통로가 바뀌며 첫 단계로 돌아갑니다. S와 T는 고정입니다. 이웃 순서는 위 → 오른쪽 → 아래 → 왼쪽입니다.</p><div class="scroller"><div class="editor" aria-label="벽 편집"></div></div><p class="error" role="alert"></p></form><div class="view" data-view="grid"></div><p class="status" role="status" aria-live="polite" aria-atomic="true"></p><div class="controls" data-controls="grid"></div></div></div>
+
 <details class="question"><summary>방문 배열을 좌표만으로 만들면 언제 틀릴까요?</summary><p>열쇠 보유 여부나 벽을 부술 수 있는 남은 횟수가 다음 이동을 바꾸면, 같은 좌표도 서로 다른 상태입니다. 그때는 dist[행][열][상태]가 필요합니다. 간선 비용이 서로 다르면 이 BFS의 거리 확정 근거도 다시 검토해야 합니다.</p></details>
 </section>
 <section class="lesson" id="lis" data-lab="lis">
 <header><p class="eyebrow">03 / CANDIDATES &amp; RECONSTRUCTION</p><h2>tails를 그대로 답으로 쓰면 왜 틀릴까?</h2><p>엄격 증가 부분수열을 찾습니다. 길이별 최소 끝값 후보와 실제 원본 인덱스의 연결을 구분하세요.</p></header>
 <div class="concept"><b>불변식 · tails[k]는 길이 k+1인 후보의 최소 끝값입니다.</b>교체는 더 유리한 끝값을 남깁니다. 실제 수열은 각 원소를 처리할 때 기록한 parent 인덱스를 따라 복원합니다.</div>
 <figure class="static-summary"><div class="scroller" tabindex="0" role="region" aria-label="tails와 실제 LIS 비교 그림, 가로 스크롤 가능"><svg viewBox="0 0 640 256" role="img" aria-labelledby="lis-static-title lis-static-desc"><title id="lis-static-title">tails 2, 4, 6과 실제 LIS 3, 5, 6</title><desc id="lis-static-desc">입력 3, 5, 6, 2, 4의 tails 2, 4, 6은 원본 순서가 아니며, 부모 인덱스 2에서 1과 0을 따라 복원하면 3, 5, 6을 얻습니다.</desc><text x="40" y="36">입력 [3, 5, 6, 2, 4]</text><rect x="40" y="56" width="560" height="64" rx="6" class="cell"/><text x="56" y="82">길이별 후보 tails = [2, 4, 6]</text><text x="56" y="106" class="caption">원본 인덱스 [3, 4, 2] · 순서가 뒤집혀 답으로 쓸 수 없음</text><rect x="40" y="136" width="560" height="64" rx="6" class="selected"/><text x="56" y="162">복원한 LIS = [3, 5, 6] · 길이 3</text><text x="56" y="186" class="caption">parent[2] = 1, parent[1] = 0 · 원본 인덱스 [0, 1, 2]</text><text x="40" y="236" class="caption">후보 배열은 길이를 관리하고, parent 연결은 실제 수열을 보존합니다.</text></svg></div><figcaption>중복은 lower_bound로 기존 후보를 교체합니다. 같은 값으로 엄격 증가 길이가 늘어나지 않습니다.</figcaption></figure>
-<div class="interactive" hidden><div class="panel"><form class="settings" data-form="lis"><label>정수 배열 · 최대 9개 (빈 입력도 가능)<input name="array" value="3, 5, 6, 2, 4" autocomplete="off"></label><div class="presets"><button class="primary" type="submit">입력 적용</button><button type="button" data-lis-preset="counter">tails 반례</button><button type="button" data-lis-preset="duplicates">중복 값</button><button type="button" data-lis-preset="descending">모두 감소</button><button type="button" data-lis-preset="empty">빈 배열</button></div><p class="error" role="alert"></p></form><div class="view" data-view="lis"></div><p class="status" role="status" aria-live="polite" aria-atomic="true"></p><div class="controls" data-controls="lis"></div></div></div>
+
 <details class="question"><summary>upper_bound로 바꾸면 어떤 문제를 풀게 될까요?</summary><p>[2,2,2]에서 lower_bound는 첫 2의 위치를 계속 교체하므로 엄격 증가 길이는 1입니다. upper_bound를 쓰면 같은 값 뒤에 추가하여 비감소 부분수열 길이 3을 구합니다. 비교 조건 하나가 문제 정의를 바꿉니다.</p></details>
 </section>
-<noscript><p class="concept">JavaScript가 꺼져 있어 완성된 예제 그림을 표시합니다. 입력 변경과 단계 탐색은 JavaScript를 켜면 사용할 수 있습니다.</p></noscript>
+<noscript><p class="concept">완성된 예제 그림입니다. 단계별 설명은 교과서의 ‘예제 따라가기’에서 확인하세요.</p></noscript>
 <footer><p>AlgoBook · C++17 · 모든 계산은 브라우저 안에서 실행됩니다.</p><p>설계 참고: <a href="https://github.com/cathrynlavery/diagram-design">diagram-design</a> · 의미별 강조, 제한된 초점, 읽을 수 있는 라벨과 로컬 스크롤. 기존 AlgoBook 색상·글꼴을 적용했습니다.</p></footer>
 </main>
-<script id="lab-models">
-(function(root){
-'use strict';
-const clone=x=>JSON.parse(JSON.stringify(x));
-function sequence(text,positive=false){
- const parts=String(text).trim().split(/[\s,]+/).filter(Boolean);
- if(parts.length>9||positive&&!parts.length)throw Error('정수를 '+(positive?'1~9':'0~9')+'개 입력하세요.');
- if(parts.some(x=>!/^[-]?\d+$/.test(x)))throw Error('정수만 쉼표 또는 공백으로 구분해 주세요.');
- const a=parts.map(Number);
- if(a.some(x=>!Number.isSafeInteger(x)||Math.abs(x)>10000||positive&&x<=0))throw Error(positive?'작업량은 1~10000이어야 합니다.':'각 값은 −10000~10000이어야 합니다.');
- return a;
-}
-function pack(a,cap){
- const groups=[];let load=0,group=[];
- for(const x of a){if(x>cap)return {groups:[],days:Infinity};if(load+x>cap){groups.push(group);group=[];load=0;}group.push(x);load+=x;}
- if(group.length)groups.push(group);return {groups,days:groups.length};
-}
-function capacity(a,days){
- if(!a.length||a.length>9||a.some(x=>!Number.isInteger(x)||x<=0||x>10000))throw Error('양의 작업량 1~9개가 필요합니다.');
- if(!Number.isInteger(days)||days<1||days>9)throw Error('D는 1~9 정수여야 합니다.');
- const min=Math.max(...a),max=a.reduce((s,x)=>s+x,0),frames=[];let lo=min,hi=max;
- while(lo<hi){const mid=lo+Math.floor((hi-lo)/2),p=pack(a,mid),ok=p.days<=days,nextLo=ok?lo:mid+1,nextHi=ok?mid:hi;frames.push({lo,hi,mid,...p,ok,nextLo,nextHi,min,max,done:false});lo=nextLo;hi=nextHi;}
- frames.push({lo,hi,mid:lo,...pack(a,lo),ok:true,nextLo:lo,nextHi:hi,min,max,done:true});return {a:[...a],days,frames,result:lo};
-}
-function parseGrid(text){
- const g=String(text).trim().split(/\r?\n/).map(s=>s.trim());
- if(!g.length||g.length>5||!g[0].length||g[0].length>7||g.some(r=>r.length!==g[0].length||!/^[01]+$/.test(r)))throw Error('같은 길이의 0/1 행을 입력하세요 (1~5행, 1~7열).');
- return g;
-}
-function bfs(g){
- g=parseGrid(g.join('\n'));const n=g.length,m=g[0].length,dist=Array.from({length:n},()=>Array(m).fill(-1)),parent=Array.from({length:n},()=>Array(m).fill(null)),q=[],frames=[],done=[],path=[];
- const snapshot=(note,current=null,edge=null)=>frames.push(clone({dist,parent,queue:q,done,current,edge,path,note}));
- if(g[0][0]==='0'||g[n-1][m-1]==='0'){snapshot('출발점 또는 도착점이 벽이므로 도달할 수 없습니다.');return {g,frames,result:-1,path};}
- dist[0][0]=0;q.push([0,0]);snapshot('S를 큐에 넣습니다. dist[S]=0, 부모는 없습니다.');
- while(q.length){const [r,c]=q.shift();snapshot('('+r+','+c+')를 큐 앞에서 꺼냅니다. 거리 '+dist[r][c]+'인 칸의 이웃을 살핍니다.',[r,c]);
-  for(const [dr,dc] of [[-1,0],[0,1],[1,0],[0,-1]]){const nr=r+dr,nc=c+dc;if(nr<0||nr>=n||nc<0||nc>=m||g[nr][nc]==='0'||dist[nr][nc]!==-1)continue;dist[nr][nc]=dist[r][c]+1;parent[nr][nc]=[r,c];q.push([nr,nc]);snapshot('('+nr+','+nc+') 첫 발견: 거리 '+dist[nr][nc]+', 부모 ('+r+','+c+'). 큐 뒤에 추가합니다.',[r,c],[[r,c],[nr,nc]]);}
-  done.push([r,c]);
- }
- if(dist[n-1][m-1]!==-1){let at=[n-1,m-1];while(at){path.push(at);at=parent[at[0]][at[1]];}path.reverse();}
- snapshot(path.length?'전체 탐색 완료. T에서 parent를 따라 되짚고 뒤집으면 '+(path.length-1)+'회 이동 경로를 얻습니다.':'큐가 비었습니다. T의 거리가 −1이므로 도달할 수 없습니다.');return {g,frames,result:dist[n-1][m-1],path};
-}
-function lis(a){
- if(a.length>9||a.some(x=>!Number.isSafeInteger(x)||Math.abs(x)>10000))throw Error('−10000~10000 정수를 최대 9개 입력하세요.');
- const tails=[],tailIndex=[],parent=Array(a.length).fill(-1),frames=[];
- const snapshot=(i,pos,old,note,done=false)=>{const chain=[];let at=tailIndex.length?tailIndex[tailIndex.length-1]:-1;while(at!==-1){chain.push(at);at=parent[at];}chain.reverse();frames.push(clone({i,pos,old,tails,tailIndex,parent,chain,note,done}));};
- snapshot(-1,-1,null,'아직 처리한 원소가 없습니다. tails와 parent는 서로 다른 정보를 저장합니다.');
- for(let i=0;i<a.length;i++){let l=0,r=tails.length;while(l<r){const m=l+Math.floor((r-l)/2);if(tails[m]<a[i])l=m+1;else r=m;}const p=l,old=tails[p]??null;if(p>0)parent[i]=tailIndex[p-1];tails[p]=a[i];tailIndex[p]=i;snapshot(i,p,old,'a['+i+']='+a[i]+': 첫 tails ≥ '+a[i]+' 위치 '+p+'. '+(old===null?'새 길이 '+(p+1)+'을 추가합니다.':old+'을 '+a[i]+'로 교체합니다. 길이는 늘지 않습니다.'));}
- snapshot(a.length,-1,null,'입력 처리 완료. 마지막 길이의 tailIndex부터 parent를 역추적한 뒤 뒤집습니다.',true);const final=frames[frames.length-1];return {a:[...a],frames,result:final.chain.map(i=>a[i]),indices:final.chain};
-}
-root.LabModels={sequence,pack,capacity,parseGrid,bfs,lis};
-})(window);
-</script>
-<script id="lab-ui">
-(function(){
-'use strict';
-const M=window.LabModels,states={},ids=['binary','grid','lis'],params=new URLSearchParams(location.search),only=params.get('lab'),embedded=params.get('embed')==='1';
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const section=id=>document.getElementById(id),has=(a,p)=>a.some(x=>x[0]===p[0]&&x[1]===p[1]);
-if(embedded)document.body.classList.add('embed');
-if(ids.includes(only))ids.forEach(id=>section(id).hidden=id!==only);
-function svg(id,title,desc,body,w=640,h=200){return '<div class="scroller" role="region" tabindex="0" aria-label="'+esc(title)+' · 가로 스크롤 가능"><svg style="--canvas:'+w+'px" viewBox="0 0 '+w+' '+h+'" role="img" aria-labelledby="'+id+'-title '+id+'-desc"><title id="'+id+'-title">'+esc(title)+'</title><desc id="'+id+'-desc">'+esc(desc)+'</desc>'+body+'</svg></div>';}
-function text(x,y,s,cls=''){return '<text x="'+x+'" y="'+y+'" class="'+cls+'">'+esc(s)+'</text>';}
-function rect(x,y,w,h,cls='cell'){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6" class="'+cls+'"/>';}
-function cells(a,{active=-1,selected=[],labels=[],id='cells',title='배열',desc='값과 인덱스'}={}){const w=Math.max(360,80+a.length*80);let b='';if(!a.length)b=text(40,76,'비어 있음');a.forEach((v,i)=>{let x=40+i*80;b+=rect(x,40,72,56,i===active?'active':selected.includes(i)?'selected':'cell')+text(x+4,75,v,'value')+text(x,124,labels[i]??('i='+i),'caption');});return svg(id,title,desc,b,w,156);}
-function controls(id){section(id).querySelector('.controls').innerHTML='<button type="button" data-action="first">처음</button><button type="button" data-action="prev">이전</button><button type="button" data-action="next">다음 단계</button><button type="button" data-action="last">결과 보기</button><output></output><label>단계 이동<input type="range" min="0" value="0" aria-label="'+id+' 실행 단계"></label>';const c=section(id).querySelector('.controls');c.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(!action)return;const s=states[id],last=s.data.frames.length-1;s.index=action==='first'?0:action==='last'?last:Math.max(0,Math.min(last,s.index+(action==='next'?1:-1)));draw(id);});c.querySelector('input').addEventListener('input',e=>{states[id].index=Number(e.target.value);draw(id);});}
-function binaryView(d,f){
- const width=560,span=f.max-f.min||1,x=v=>40+(v-f.min)/span*width;
- let b=text(40,28,'후보 범위 · 양 끝 포함 [lo, hi]');
- b+='<rect x="40" y="56" width="560" height="24" fill="#e3e9ee" rx="4"/>';
- b+='<rect x="'+x(f.lo)+'" y="56" width="'+Math.max(3,x(f.hi)-x(f.lo))+'" height="24" fill="#0f766e" rx="2"/>';
- b+='<line x1="'+x(f.mid)+'" x2="'+x(f.mid)+'" y1="44" y2="96" stroke="#a74414" stroke-width="3"/>';
- b+=text(40,116,'전체 하한 '+f.min,'caption')+'<text x="600" y="116" text-anchor="end" class="caption">전체 상한 '+f.max+'</text>';
- b+=text(40,148,'lo = '+f.lo+'     mid = '+f.mid+'     hi = '+f.hi,'value');
- let html='<h3>01 · 답 후보와 검사할 용량</h3>'+svg('capacity-range','용량 후보 구간','현재 답 후보 '+f.lo+'부터 '+f.hi+', 검사 용량 '+f.mid,b,640,176)+'<p class="legend"><b>초록 막대</b> 답 후보 · <b>세로선</b> 검사할 mid · 회색은 이미 제외한 범위</p><h3>02 · C = '+f.mid+'로 작업을 나누면</h3>';
- html+=f.groups.map((g,i)=>'<div class="pack"><strong>'+(i+1)+'일차</strong>'+g.map(v=>'<span class="token">'+v+'</span>').join('')+'<span>합 '+g.reduce((s,x)=>s+x,0)+' / 용량 '+f.mid+'</span></div>').join('');
- html+='<p class="outcome">'+(f.done?'정답 '+f.mid+' · ':'')+'필요 '+f.days+'일 '+(f.ok?'≤':' >')+' 허용 '+d.days+'일 → '+(f.ok?'가능':'불가능')+'</p>';
- html+=f.done?'<p class="note">lo = hi에서 종료합니다. 최소 가능한 용량을 반환합니다.</p>':'<details class="question"><summary>다음 범위를 먼저 예상한 뒤 확인하기</summary><p>'+(f.ok?'가능한 mid는 답일 수 있어 남깁니다. hi = mid.':'mid 이하도 불가능합니다. lo = mid + 1.')+' 다음 후보는 ['+f.nextLo+', '+f.nextHi+']입니다.</p></details>';
- return html;
-}
-function gridView(d,f){
- const n=d.g.length,m=d.g[0].length,w=Math.max(360,80+m*72),h=72+n*72;let b='';
- for(let c=0;c<m;c++)b+=text(62+c*72,28,'c='+c,'caption');
- for(let r=0;r<n;r++){b+=text(8,74+r*72,'r='+r,'caption');for(let c=0;c<m;c++){const x=40+c*72,y=40+r*72,p=[r,c],wall=d.g[r][c]==='0',current=f.current&&has([f.current],p),onPath=has(f.path,p),queued=has(f.queue,p),start=r===0&&c===0,target=r===n-1&&c===m-1;let role=wall?'벽':current?'현재':onPath?'경로':queued?'대기':f.dist[r][c]>=0?'방문':'미방문';b+=rect(x,y,64,64,wall?'wall':current?'active':onPath?'selected':'cell');b+=text(x+10,y+26,wall?'#':f.dist[r][c]===-1?'·':f.dist[r][c],'value'+(wall?' wall-text':''));b+=text(x+7,y+50,start&&target?'S/T':start?'S · '+role:target?'T · '+role:role,'caption'+(wall?' wall-text':''));}}
- let html='<h3>01 · 격자와 최소 거리</h3>'+svg('bfs-grid','격자 BFS 상태',f.note,b,w,h)+'<p class="legend"><b>숫자</b> 시작부터 이동 수 · <b>#</b> 벽 · <b>·</b> 미발견 · 현재/대기/경로를 글자로 구분</p><h3>02 · 큐 앞에서 꺼내고 뒤에 넣기</h3><div class="state-line"><b>앞</b>'+f.queue.map(p=>'<span class="token">('+p.join(',')+')</span>').join('')+(f.queue.length?'':'<span>비어 있음</span>')+'<b>뒤</b></div>';
- if(f.edge){const [a,z]=f.edge;html+='<p class="note">새 부모 연결: parent['+z.join('][')+'] = ('+a.join(',')+'). 거리 '+f.dist[a[0]][a[1]]+' + 1 = '+f.dist[z[0]][z[1]]+'.</p>';}
- if(f.path.length)html+='<h3>03 · parent를 역추적해 복원한 경로</h3><div class="subsequence">'+f.path.map((p,i)=>'<span>'+(i?'→ ':'')+'('+p.join(',')+')</span>').join('')+'</div><p class="outcome">최소 이동 '+d.result+'회 · 경로의 칸 수 '+f.path.length+'개</p>';
- if(states.grid.index===d.frames.length-1&&d.result<0)html+='<p class="outcome">도달 불가 · 결과 −1</p>';
- return html;
-}
-function lisView(d,f){
- const processed=Math.min(f.i+1,d.a.length),chain=f.chain;
- let html='<h3>01 · 원본 순서를 유지하는 입력</h3>'+cells(d.a,{id:'lis-input',title:'원본 배열',active:f.i,selected:f.done?chain:[],desc:f.note})+'<h3>02 · 길이별 최소 끝값 후보</h3>'+cells(f.tails,{id:'lis-tails',title:'길이별 최소 끝값',active:f.pos,labels:f.tails.map((_,i)=>'길이 '+(i+1)),desc:'tails는 실제 부분수열이 아닐 수 있습니다.'});
- html+='<p class="note">tailIndex = ['+f.tailIndex.join(', ')+'] · 각 꼬리 값이 나온 원본 위치입니다.</p><div class="table-wrap"><table><caption>처리 당시 기록한 parent</caption><thead><tr><th>원본 i</th><th>a[i]</th><th>parent[i]</th></tr></thead><tbody>'+d.a.slice(0,processed).map((a,i)=>'<tr><td>'+i+'</td><td>'+a+'</td><td>'+f.parent[i]+(f.parent[i]<0?' · 시작':' · 값 '+d.a[f.parent[i]])+'</td></tr>').join('')+'</tbody></table></div><h3>03 · 현재까지 복원 가능한 실제 수열</h3>';
- const w=Math.max(360,80+chain.length*104);let b='';
- chain.forEach((i,j)=>{const x=40+j*104;if(j<chain.length-1)b+='<path class="arrow" d="M '+(x+80)+' 68 H '+(x+104)+'"/><path class="arrow" d="M '+(x+96)+' 64 L '+(x+104)+' 68 L '+(x+96)+' 72"/>';});
- chain.forEach((i,j)=>{const x=40+j*104;b+=rect(x,40,80,56,'selected')+text(x+8,74,d.a[i],'value')+text(x,124,'원본 i='+i,'caption');});if(!chain.length)b=text(40,76,'아직 비어 있음');
- html+=svg('lis-chain','부모로 복원한 실제 부분수열','원본 인덱스 '+chain.join(', ')+', 값 '+chain.map(i=>d.a[i]).join(', '),b,w,156)+'<p class="legend">연결선은 복원한 수열 순서입니다. 원본 인덱스와 값이 모두 증가해야 합니다.</p>';
- if(f.done){const ordered=f.tailIndex.every((v,i)=>!i||f.tailIndex[i-1]<v);html+='<p class="outcome">엄격 증가 LIS 길이 '+chain.length+' · ['+chain.map(i=>d.a[i]).join(', ')+']</p><p class="note">'+(ordered?'이번 입력은 tails의 원본 위치도 순서대로입니다. 항상 그런 것은 아니므로 ‘tails 반례’를 눌러 비교하세요.':'tails의 원본 인덱스 ['+f.tailIndex.join(', ')+']는 증가하지 않습니다. 각 길이의 끝값은 별개의 후보이며, 이 위치들을 그대로 이어 붙일 수 없습니다.')+'</p>';}
- return html;
-}
-function draw(id){const s=states[id],f=s.data.frames[s.index],root=section(id),c=root.querySelector('.controls');root.querySelector('.view').innerHTML=({binary:binaryView,grid:gridView,lis:lisView}[id])(s.data,f);root.querySelector('.status').textContent=id==='binary'?(f.done?'최소 용량 '+f.mid+'에서 종료합니다.':'용량 '+f.mid+' 검사: '+f.days+'일 필요 → '+(f.ok?'가능. mid를 포함한 왼쪽 후보를 남깁니다.':'불가능. mid까지 제외합니다.')):f.note;c.querySelector('output').textContent='단계 '+s.index+' / '+(s.data.frames.length-1);for(const action of ['first','prev'])c.querySelector('[data-action='+action+']').disabled=s.index===0;for(const action of ['next','last'])c.querySelector('[data-action='+action+']').disabled=s.index===s.data.frames.length-1;const input=c.querySelector('input');input.max=s.data.frames.length-1;input.value=s.index;notifyHeight();}
-function editor(g){const el=section('grid').querySelector('.editor');el.style.setProperty('--cols',g[0].length);el.innerHTML=g.map((r,i)=>[...r].map((v,j)=>{const endpoint=i===0&&j===0||i===g.length-1&&j===r.length-1;return '<button type="button" data-cell="'+i+','+j+'" aria-label="행 '+i+' 열 '+j+' '+(v==='0'?'벽':'통로')+'" aria-pressed="'+(v==='0')+'" '+(endpoint?'disabled':'')+'>'+(i===0&&j===0?'S':endpoint?'T':v==='0'?'#':'·')+'</button>';}).join('')).join('');}
-function apply(id){const root=section(id),form=root.querySelector('form');try{let data;if(id==='binary')data=M.capacity(M.sequence(form.elements.array.value,true),Number(form.elements.days.value));if(id==='grid')data=M.bfs(M.parseGrid(form.elements.grid.value));if(id==='lis')data=M.lis(M.sequence(form.elements.array.value));states[id]={data,index:0};draw(id);if(id==='grid')editor(data.g);form.querySelector('.error').textContent='';root.querySelector('.interactive').hidden=false;root.classList.add('enhanced');notifyHeight();}catch(e){form.querySelector('.error').textContent=e.message;}}
-function notifyHeight(){if(embedded&&parent!==window)parent.postMessage({type:'algobook-lab-height',lab:only,height:document.documentElement.offsetHeight},location.origin);}
-for(const id of ids){controls(id);const form=section(id).querySelector('form');form.addEventListener('submit',e=>{e.preventDefault();apply(id);});form.addEventListener('input',()=>{form.querySelector('.error').textContent='입력이 바뀌었습니다. 적용 버튼을 눌러 새 실험을 시작하세요.';});apply(id);}
-document.querySelectorAll('[data-binary-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.binaryPreset,f=section('binary').querySelector('form');f.elements.array.value=p==='single'?'10':'7, 2, 5, 10, 8';f.elements.days.value=p==='one-day'||p==='single'?1:p==='each-day'?5:2;apply('binary');}));
-document.querySelectorAll('[data-grid-preset]').forEach(b=>b.addEventListener('click',()=>{section('grid').querySelector('textarea').value={detour:'1110\n0101\n1111',blocked:'10\n01',same:'1'}[b.dataset.gridPreset];apply('grid');}));
-document.querySelectorAll('[data-lis-preset]').forEach(b=>b.addEventListener('click',()=>{section('lis').querySelector('input').value={counter:'3, 5, 6, 2, 4',duplicates:'2, 2, 2',descending:'5, 4, 3, 2, 1',empty:''}[b.dataset.lisPreset];apply('lis');}));
-section('grid').querySelector('.editor').addEventListener('click',e=>{const cell=e.target.closest('[data-cell]');if(!cell||cell.disabled)return;const [r,c]=cell.dataset.cell.split(',').map(Number),g=states.grid.data.g.map(x=>[...x]);g[r][c]=g[r][c]==='0'?'1':'0';section('grid').querySelector('textarea').value=g.map(x=>x.join('')).join('\n');apply('grid');section('grid').querySelector('[data-cell="'+r+','+c+'"]').focus();});
-if(typeof ResizeObserver!=='undefined')new ResizeObserver(notifyHeight).observe(document.querySelector('main'));
-window.addEventListener('load',notifyHeight);
-})();
-</script>
-</body></html>
+
+
+<script>const destination={binary:"?example=capacity#binary",grid:"?example=detour#grid-search",lis:"?example=reconstruct#lis"};const selected=new URLSearchParams(location.search).get("lab");location.replace("index.html"+(destination[selected]||"#home"));</script></body></html>

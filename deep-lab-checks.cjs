@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs'), vm = require('node:vm'), cp = require('node:child_process');
 const os = require('node:os'), path = require('node:path');
 const html = fs.readFileSync('docs/visual-study.html', 'utf8');
-const source = html.match(/<script id="lab-models">([\s\S]*?)<\/script>/)[1];
+const source = fs.readFileSync('docs/example-models.js', 'utf8');
 const sandbox = { window: {} }; vm.runInNewContext(source, sandbox);
 const M = sandbox.window.LabModels;
 const plain = x => JSON.parse(JSON.stringify(x));
@@ -70,12 +70,16 @@ for(const a of [[],[3,5,6,2,4],[2,2,2],[9,8,7],[-10000,0,10000],...Array.from({l
 }
 const counter=M.lis([3,5,6,2,4]);assert.deepEqual(plain(counter.frames.at(-1).tails),[2,4,6]);assert.deepEqual(plain(counter.result),[3,5,6]);
 // Compile the exact new C++ snippet shown in the HTML, including its early cap rejection.
-const snippet=html.match(/<details class="code">[\s\S]*?<pre><code>([\s\S]*?)<\/code>/)[1].replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&');
+sandbox.window.WorkedExamples={catalogue:{binary:[], 'grid-search':[], lis:[]}};
+vm.runInNewContext(fs.readFileSync('docs/worked-details.js','utf8'),sandbox);
+const displayed=sandbox.window.WorkedExamples.catalogue.binary[0].detail;
+assert.equal(displayed,html.match(/<details class="code">[\s\S]*?<\/details>/)[0],'Static and main-page C++ must match');
+const snippet=displayed.match(/<pre><code>([\s\S]*?)<\/code>/)[1].replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&amp;','&');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'algobook-deep-'));
 try {
  const assertions=cppCases.map(({a,days,want})=>'assert(minimumCapacity({'+a.join(',')+'},'+days+')=='+want+');').join('\n');
  fs.writeFileSync(path.join(dir,'test.cpp'),'#include <bits/stdc++.h>\nusing namespace std;\n'+snippet+'\nint main(){assert(!feasible({10},1,9));\n'+assertions+'\n}');
  cp.execFileSync('g++',['-std=c++17','-O2',path.join(dir,'test.cpp'),'-o',path.join(dir,'test')]);cp.execFileSync(path.join(dir,'test'));
 } finally {fs.rmSync(dir,{recursive:true,force:true});}
-assert(!/<script[^>]+src=|<link[^>]+stylesheet|\bfetch\s*\(|\bXMLHttpRequest\b/.test(html),'Labs must remain self-contained with no network dependency');
+assert(!/\bfetch\s*\(|\bXMLHttpRequest\b/.test(source),'Example models must remain local');
 console.log(JSON.stringify({independentCases:cases,displayedCppCases:cppCases.length,status:'passed'}));
